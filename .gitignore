@@ -1,16 +1,21 @@
-# Entorno virtual
+# === ENTORNO VIRTUAL Y PYTHON ===
+backend/venv/
+backend/.venv/
 venv/
 .venv/
-env/
-
-# Archivos compilados de Python
 *.pyc
 __pycache__/
 
-# Base de datos local de desarrollo (por defecto en Django)
-db.sqlite3
+# === BASE DE DATOS LOCAL ===
+*.sqlite3
 
-# Archivos del sistema u otros editores (opcional)
-.DS_Store
+# === ANGULAR Y NODE ===
+**/node_modules/
+.angular/
+/dist/
+
+# === SISTEMA Y EDITORES ===
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
