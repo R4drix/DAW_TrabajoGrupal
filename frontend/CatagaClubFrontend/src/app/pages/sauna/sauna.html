@@ -1,0 +1,41 @@
+<section class="hero-sauna">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Bienestar & Relajación</div>
+    <h1>NUESTRO SAUNA</h1>
+    <h3>Un oasis de renovación</h3>
+    <p>
+      Desconéctate del mundo exterior y sumérgete en una experiencia 
+      diseñada para purificar el cuerpo y calmar la mente.
+    </p>
+    <a routerLink="" class="btn-hero">
+      Reservar Sesión
+    </a>
+  </div>
+</section>
+
+<section class="servicios">
+
+  <div class="section-header">
+    <div class="section-label">El circuito</div>
+    <h2 class="section-title">Espacios de Bienestar</h2>
+  </div>
+
+  <div class="cards">
+    @for (camara of camaras; track camara) {
+        <div class="card">
+            <h3>{{camara.camara}}</h3>
+            <div class="card-line"></div>
+            <p>{{camara.description}}</p>
+        </div>
+    }
+  </div>
+
+</section>
+
+<section class="sauna-info">
+  <div class="info-content">
+    <i class="ti ti-clock" aria-hidden="true"></i>
+    <p><strong>Horario de atención:</strong> Todos los días de --- hrs.</p>
+    <small>Incluye servicio de toallas, batas y cortesía de la casa (infusiones relajantes).</small>
+  </div>
+</section>
