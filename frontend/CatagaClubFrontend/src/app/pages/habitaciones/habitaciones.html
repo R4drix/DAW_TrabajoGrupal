@@ -1,0 +1,27 @@
+<h1>Habitaciones</h1>
+
+<div class="contenedor">
+
+  <div
+  class="card"
+  *ngFor="let h of habitaciones">
+
+      <h2>
+        {{h.nombre}}
+      </h2>
+
+      <p>
+        {{h.descripcion}}
+      </p>
+
+      <h3>
+        S/ {{h.precio}}
+      </h3>
+
+      <button>
+        Reservar
+      </button>
+
+  </div>
+
+</div>

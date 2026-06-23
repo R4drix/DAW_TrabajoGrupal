@@ -1,0 +1,84 @@
+/* ==========================
+   FOOTER
+========================== */
+footer {
+  background-color: var(--black);
+  border-top: 1px solid rgba(201, 168, 76, 0.15);
+  padding: 60px 50px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.footer-logo {
+  height: 48px;
+  width: auto;
+  border-radius: 6px;
+  opacity: 0.9;
+}
+
+.footer-brand h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.footer-divider {
+  width: 60px;
+  height: 1px;
+  background: rgba(201, 168, 76, 0.4);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-links a {
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888888;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: var(--gold);
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: #555555;
+  text-align: center;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 600px) {
+  footer {
+    padding: 40px 24px 32px;
+    gap: 24px;
+  }
+
+  .footer-links {
+    gap: 20px;
+  }
+}
