@@ -1,0 +1,155 @@
+/* ==========================
+   NAVBAR
+========================== */
+nav {
+  background-color: var(--black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 50px;
+  height: 90px;
+  z-index: 100;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+  /* SIN position: sticky ni top: 0 */
+}
+
+/* ==========================
+   BRAND
+========================== */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.logo {
+  height: 48px;
+  width: auto;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.brand h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ==========================
+   MENÚ
+========================== */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu li a {
+  color: #cccccc;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.menu li a:hover {
+  color: var(--gold);
+}
+
+/* línea dorada animada */
+.menu li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.3s;
+}
+
+.menu li:hover::after {
+  width: 100%;
+}
+
+/* ==========================
+   BOTÓN RESERVA
+========================== */
+.btn-reserva {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--black);
+  background: var(--gold);
+  padding: 14px 28px;
+  margin-left: 40px;
+  white-space: nowrap;
+  transition: 0.3s;
+}
+
+.btn-reserva:hover {
+  background: #e0be6a;
+  gap: 16px;
+}
+
+.btn-reserva i {
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 1100px) {
+  nav {
+    padding: 0 30px;
+  }
+
+  .menu {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  nav {
+    flex-direction: column;
+    height: auto;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .menu {
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-reserva {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+}

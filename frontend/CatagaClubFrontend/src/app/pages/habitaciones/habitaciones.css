@@ -1,0 +1,26 @@
+h1{
+    text-align:center;
+    margin:40px;
+}
+
+.contenedor{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(300px,1fr));
+
+    gap:20px;
+
+    padding:30px;
+}
+
+.card{
+
+    border:1px solid #ddd;
+
+    padding:20px;
+
+    border-radius:10px;
+
+}

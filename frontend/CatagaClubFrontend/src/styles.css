@@ -1,1 +1,56 @@
-/* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+
+:root{
+    --gold: #D4AF37;
+    --black: #111111;
+    --white: #FFFFFF;
+    --gray: #F5F5F5;
+    --text: #333333;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background: var(--white);
+    color: var(--text);
+}
+
+a{
+    text-decoration: none;
+    color: inherit;
+}
+
+ul{
+    list-style: none;
+}
+
+.container{
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.btn{
+    background: var(--gold);
+    color: var(--white);
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+.section-title{
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card{
+    background: var(--white);
+    border: 1px solid #ddd;
+    padding: 20px;
+}
