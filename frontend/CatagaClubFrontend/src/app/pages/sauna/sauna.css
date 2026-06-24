@@ -1,0 +1,205 @@
+
+.hero-sauna {
+  background-color: #000000;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 40px 80px;
+  position: relative;
+}
+
+.btn-hero {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--black);
+  background: var(--gold);
+  padding: 16px 40px;
+  transition: 0.3s;
+}
+
+.btn-hero:hover {
+  background: #e0be6a;
+  letter-spacing: 4px;
+  cursor: pointer;
+}
+
+.hero-sauna .hero-content * {
+  color: #ffffff;
+}
+
+.hero-sauna .hero-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  color: #c9a84c !important;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.hero-sauna .hero-eyebrow::before,
+.hero-sauna .hero-eyebrow::after {
+  content: "";
+  width: 30px;
+  height: 1px;
+  background: #c9a84c;
+}
+
+.hero-sauna h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: #ffffff !important;
+  letter-spacing: 8px;
+  margin-bottom: 12px;
+  font-family: 'Playfair Display', serif;
+}
+
+.hero-sauna h3 {
+  font-size: 0.8rem;
+  font-weight: 300;
+  letter-spacing: 4px;
+  color: #c9a84c !important;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.hero-sauna p {
+  font-size: 1rem;
+  color: #aaaaaa !important;
+  line-height: 1.8;
+  max-width: 420px;
+  margin: 0 auto 44px;
+}
+
+.servicios {
+  background-color: #111111 !important;
+  padding: 100px 40px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  color: #c9a84c !important;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-label::before,
+.section-label::after {
+  content: "";
+  width: 30px;
+  height: 1px;
+  background: #c9a84c;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: #ffffff !important;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(201, 168, 76, 0.15);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.card {
+  background: #111111 !important;
+  padding: 50px 32px;
+  text-align: center;
+  border: 1px solid rgba(201, 168, 76, 0.1);
+  transition: 0.4s;
+}
+
+.card:hover {
+  background: #161610 !important;
+  border-color: rgba(201, 168, 76, 0.3);
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 24px;
+}
+
+.card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #ffffff !important;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.card-line {
+  width: 30px;
+  height: 1px;
+  background: #c9a84c;
+  margin: 0 auto 16px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #888888 !important;
+  line-height: 1.8;
+}
+
+.sauna-info {
+  background-color: #0b0b0b;
+  padding: 60px 40px;
+  text-align: center;
+  border-top: 1px solid rgba(201, 168, 76, 0.1);
+}
+
+.info-content i {
+  font-size: 1.5rem;
+  color: #c9a84c;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.info-content p {
+  font-size: 1.1rem;
+  color: #ffffff;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.info-content small {
+  font-size: 0.85rem;
+  color: #666666;
+  display: block;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .hero-sauna h1 {
+    letter-spacing: 4px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
