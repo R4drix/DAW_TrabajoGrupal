@@ -22,10 +22,14 @@
 
   <div class="cards">
     @for (camara of camaras; track camara) {
-        <div class="card">
-            <h3>{{camara.camara}}</h3>
+        <div class="card" routerLink="{{camara.router}}">
+            
+            <span class="card-icon">
+              <i class="ti ti-{{camara.icon}}" aria-hidden="true"></i>
+            </span>
+            <h3>{{camara.name}}</h3>
             <div class="card-line"></div>
-            <p>{{camara.description}}</p>
+            <p>{{camara.desc}}</p>
         </div>
     }
   </div>
@@ -36,6 +40,8 @@
   <div class="info-content">
     <i class="ti ti-clock" aria-hidden="true"></i>
     <p><strong>Horario de atención:</strong> Todos los días de --- hrs.</p>
-    <small>Incluye servicio de toallas, batas y cortesía de la casa (infusiones relajantes).</small>
+    <small>Incluye servicio de toallas, batas y cortesía de la casa.</small>
   </div>
 </section>
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">

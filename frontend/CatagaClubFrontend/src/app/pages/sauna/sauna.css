@@ -137,6 +137,12 @@
   border-color: rgba(201, 168, 76, 0.3);
 }
 
+.card-icon {
+  font-size: 1.8rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 24px;
+}
 
 .card h3 {
   font-family: 'Playfair Display', serif;
