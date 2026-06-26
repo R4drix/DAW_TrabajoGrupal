@@ -1,27 +1,49 @@
-<h1>Habitaciones</h1>
+<section class="seccion-habitaciones">
+  
+  <div class="encabezado-pagina">
+    <div class="etiqueta-oro">Tu Experiencia Cátaga</div>
+    <h1 class="titulo-pagina">Nuestras Habitaciones y Suites</h1>
+    <p class="subtitulo-pagina">Espacios diseñados al detalle para tu descanso y privacidad en Cayma.</p>
+  </div>
 
-<div class="contenedor">
+  <div class="lista-habitaciones">
+    
+    <div *ngFor="let h of habitaciones; let i = index" class="tarjeta-habitacion">
+      
+      <div class="bloque-imagen">
+        <img [src]="h.fotos && h.fotos.length > 0 ? h.fotos[0] : 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1000'" [alt]="h.nombre">
+        <span class="numero-fondo">0{{ i + 1 }}</span>
+      </div>
 
-  <div
-  class="card"
-  *ngFor="let h of habitaciones">
+      <div class="bloque-contenido">
+        
+        <div class="encabezado-tarjeta">
+          <h2>{{ h.nombre }}</h2>
+          <div class="linea-oro-corta"></div>
+        </div>
 
-      <h2>
-        {{h.nombre}}
-      </h2>
+        <p class="descripcion-habitacion">
+          {{ h.descripcion }}
+        </p>
 
-      <p>
-        {{h.descripcion}}
-      </p>
+        <div class="bloque-tarifas">
+          <h4>Precios y Horarios</h4>
+          <div class="tabla-tarifas">
+            <div class="fila-tarifa" *ngFor="let tarifa of h.tarifas">
+              <span class="tiempo"><i class="ti ti-clock"></i> {{ tarifa.tiempo }}</span>
+              <span class="precio">S/ {{ tarifa.precio | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
 
-      <h3>
-        S/ {{h.precio}}
-      </h3>
+        <button class="btn-reserva-premium">
+          <i class="ti ti-calendar-check"></i> Reservar {{ h.nombre }}
+        </button>
 
-      <button>
-        Reservar
-      </button>
+      </div>
+
+    </div>
 
   </div>
 
-</div>
+</section>
