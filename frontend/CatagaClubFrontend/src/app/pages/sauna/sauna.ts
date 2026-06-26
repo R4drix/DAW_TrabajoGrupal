@@ -32,6 +32,12 @@ export class Sauna {
       desc: "Aguas termales con chorros de hidromasaje para aliviar la tensión muscular.",
       icon: "bath",
       router: ""
-    }
+    },
+    {
+      name: "Camara privada",
+      desc: "Un espacio exclusivo que ofrece total privacidad para una persona o un grupo de amigos",
+      icon: "user-check",
+      router: ""
+    },
   ]
 }

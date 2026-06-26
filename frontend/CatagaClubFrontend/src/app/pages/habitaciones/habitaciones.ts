@@ -1,5 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgFor } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+  @Component({
+    selector: 'app-habitaciones',
+    imports: [RouterLink, NgFor],
+    templateUrl: './habitaciones.html',
+    styleUrl: './habitaciones.css',
+  })
+export class Habitaciones {
+
+
 
 @Component({
   selector: 'app-habitaciones',
