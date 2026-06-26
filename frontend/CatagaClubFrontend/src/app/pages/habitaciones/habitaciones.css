@@ -1,26 +1,198 @@
-h1{
-    text-align:center;
-    margin:40px;
+.habitaciones-seccion {
+  background-color: #111111;
+  padding: 100px 40px;
+  min-height: 100vh;
 }
 
-.contenedor{
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(300px,1fr));
-
-    gap:20px;
-
-    padding:30px;
+.booking-container {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.card{
+/* COLUMNA IZQUIERDA: SELECTOR */
+.habitaciones-selector h3 {
+  font-family: 'Playfair Display', serif;
+  color: var(--white);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
 
-    border:1px solid #ddd;
+.selector-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    padding:20px;
+.selector-item {
+  background: #161616;
+  border: 1px solid rgba(201, 168, 76, 0.1);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  color: #aaaaaa;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+}
 
-    border-radius:10px;
+.selector-item:hover {
+  background: #1c1c14;
+  color: var(--white);
+  border-color: rgba(201, 168, 76, 0.3);
+}
 
+.selector-item.active {
+  background: #1c1c14;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.selector-number {
+  font-size: 0.8rem;
+  margin-right: 15px;
+  opacity: 0.5;
+  font-weight: 700;
+}
+
+.selector-name {
+  font-size: 0.95rem;
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.selector-item i {
+  font-size: 1rem;
+  transition: transform 0.3s;
+}
+
+.selector-item.active i {
+  transform: translateX(5px);
+}
+
+/* COLUMNA DERECHA: PANEL DETALLE */
+.habitacion-detalle-panel {
+  background: #161616;
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  padding: 50px;
+}
+
+/* GALERÍA DE FOTOS */
+.galeria-contenedor {
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.foto-principal {
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+.foto-principal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.foto-principal:hover img {
+  transform: scale(1.03);
+}
+
+.detalle-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.card-line-left {
+  width: 50px;
+  height: 1px;
+  background: var(--gold);
+  margin-bottom: 24px;
+}
+
+.detalle-descripcion {
+  font-size: 1rem;
+  color: #cccccc;
+  line-height: 1.8;
+  margin-bottom: 35px;
+}
+
+/* TABLA DE TARIFAS */
+.detalle-tarifas-contenedor h4 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 15px;
+}
+
+.tabla-tarifas {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 40px;
+}
+
+.tabla-fila {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tabla-celda.tiempo {
+  color: #aaaaaa;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.tabla-celda.tiempo i {
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+.tabla-celda.precio {
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+/* BOTÓN PREMIUM */
+.btn-reservar-premium {
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  padding: 18px 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: 0.3s;
+  width: 100%;
+}
+
+.btn-reservar-premium:hover {
+  background: #e0be6a;
+  letter-spacing: 3px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .booking-container {
+    grid-template-columns: 1fr;
+  }
 }

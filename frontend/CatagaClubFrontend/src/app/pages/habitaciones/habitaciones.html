@@ -1,27 +1,64 @@
-<h1>Habitaciones</h1>
+<section class="habitaciones-seccion">
+  
+  <div class="section-header">
+    <div class="section-label">Tu Experiencia Cátaga</div>
+    <h2 class="section-title">Nuestras Habitaciones y Suites</h2>
+  </div>
 
-<div class="contenedor">
+  <div class="booking-container">
+    
+    <div class="habitaciones-selector">
+      <h3>Selecciona una opción</h3>
+      <div class="selector-lista">
+        <button 
+          *ngFor="let h of habitaciones; let i = index" 
+          class="selector-item"
+          [class.active]="habitacionSeleccionada === h"
+          (click)="seleccionarHabitacion(h)">
+          <span class="selector-number">0{{ i + 1 }}</span>
+          <span class="selector-name">{{ h.nombre }}</span>
+          <i class="ti ti-chevron-right"></i>
+        </button>
+      </div>
+    </div>
 
-  <div
-  class="card"
-  *ngFor="let h of habitaciones">
+    <div class="habitacion-detalle-panel" *ngIf="habitacionSeleccionada">
+      
+      <div class="galeria-contenedor">
+        <div class="foto-principal">
+          <img [src]="habitacionSeleccionada.fotos && habitacionSeleccionada.fotos.length > 0 ? habitacionSeleccionada.fotos[0] : 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1000'" [alt]="habitacionSeleccionada.nombre">
+        </div>
+      </div>
 
-      <h2>
-        {{h.nombre}}
-      </h2>
+      <div class="detalle-header">
+        <h2>{{ habitacionSeleccionada.nombre }}</h2>
+        <div class="card-line-left"></div>
+      </div>
 
-      <p>
-        {{h.descripcion}}
+      <p class="detalle-descripcion">
+        {{ habitacionSeleccionada.descripcion }}
       </p>
 
-      <h3>
-        S/ {{h.precio}}
-      </h3>
+      <div class="detalle-tarifas-contenedor">
+        <h4>Tarifario Disponible</h4>
+        <div class="tabla-tarifas">
+          <div class="tabla-fila" *ngFor="let tarifa of habitacionSeleccionada.tarifas">
+            <div class="tabla-celda tiempo">
+              <i class="ti ti-clock"></i> {{ tarifa.tiempo }}
+            </div>
+            <div class="tabla-celda precio">
+              S/ {{ tarifa.precio | number:'1.2-2' }}
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <button>
-        Reservar
+      <button class="btn-reservar-premium">
+        <i class="ti ti-calendar-check"></i> Reservar esta Habitación
       </button>
+
+    </div>
 
   </div>
 
-</div>
+</section>
