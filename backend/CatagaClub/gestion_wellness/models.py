@@ -24,3 +24,12 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"Reserva {self.id} - {self.cliente.nombre}"
+    
+class ConsumoRestaurante(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='consumos_restaurante')
+    descripcion_plato = models.CharField(max_length=100)
+    precio = models.FloatField()
+    cantidad = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.cantidad}x {self.descripcion_plato} - Cliente: {self.cliente.nombre}"

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cataga Club - Clientes y Servicios</title>
+</head>
+<body>
+    <h1>Panel de Clientes (Servicios Independientes)</h1>
+    <a href="{% url 'wellness:cliente_crear' %}">Registrar Nuevo Cliente</a> | 
+    <a href="{% url 'wellness:consumo_crear' %}">Registrar Consumo Restaurante</a> |
+    <a href="{% url 'wellness:reserva_lista' %}">Ir a Reserva de Hotel</a>
+    <hr>
+    <ul>
+        {% for cte in clientes %}
+            <li>
+                <strong>{{ cte.nombre }}</strong> 
+                <br>
+                🧖‍♂️ <strong>Servicio Sauna:</strong> {% if cte.esta_en_sauna %}Activo (En el Sauna){% else %}Inactivo (Fuera){% endif %}
+                <br>
+                🍔 <strong>Servicio Restaurante:</strong>
+                <ul>
+                    {% for consumo in cte.consumos_restaurante.all %}
+                        <li>{{ consumo.cantidad }}x {{ consumo.descripcion_plato }} (${{ consumo.precio }})</li>
+                    {% empty %}
+                        <li>Sin consumos en el restaurante hoy.</li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <br>
+        {% empty %}
+            <li>No hay clientes en el resort.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
