@@ -7,6 +7,14 @@ export interface Habitacion {
   esta_ocupada: boolean;
 }
 
+export interface Camara {
+  id: number;
+  tipo: string;
+  descripcion: string;
+  capacidad: number;
+  icon_class: string;
+}
+
 export interface Reserva {
   id: number;
   cliente: string;

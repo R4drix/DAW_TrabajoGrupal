@@ -135,6 +135,7 @@
 .card:hover {
   background: #161610 !important;
   border-color: rgba(201, 168, 76, 0.3);
+  cursor: pointer;
 }
 
 .card-icon {

@@ -22,14 +22,14 @@
 
   <div class="cards">
     @for (camara of camaras; track camara) {
-        <div class="card" routerLink="{{camara.router}}">
+        <div class="card" routerLink="{{camara.id}}">
             
             <span class="card-icon">
-              <i class="ti ti-{{camara.icon}}" aria-hidden="true"></i>
+              <i class="ti ti-{{camara.icon_class}}" aria-hidden="true"></i>
             </span>
-            <h3>{{camara.name}}</h3>
+            <h3>{{camara.tipo}}</h3>
             <div class="card-line"></div>
-            <p>{{camara.desc}}</p>
+            <p>{{camara.descripcion}}</p>
         </div>
     }
   </div>
