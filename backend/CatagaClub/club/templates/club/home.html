@@ -1,0 +1,43 @@
+{% extends 'club/base.html' %}
+{% block title %}Inicio · Cataga Club{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h6 class="text-muted">Habitaciones</h6>
+            <h2>{{ habitaciones_total }}</h2>
+            <small class="text-success">{{ habitaciones_libres }} libres</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h6 class="text-muted">Clientes</h6>
+            <h2>{{ clientes_total }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h6 class="text-muted">Reservas activas</h6>
+            <h2>{{ reservas_activas }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h6 class="text-muted">API</h6>
+            <a href="{% url 'club:api_dashboard' %}" class="btn btn-outline-primary btn-sm">/api/dashboard/</a>
+        </div>
+    </div>
+</div>
+<div class="mt-4">
+    <div class="card p-4">
+        <h5 class="mb-3">Bienvenido al panel de gestión</h5>
+        <p class="mb-2">Use el menú superior para navegar entre los módulos:</p>
+        <ul>
+            <li><strong>Habitaciones:</strong> alta, edición y disponibilidad.</li>
+            <li><strong>Clientes:</strong> registro y servicios (sauna).</li>
+            <li><strong>Reservas:</strong> check-in / check-out con cálculo automático.</li>
+            <li><strong>Consumos:</strong> restaurante vinculado al cliente.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

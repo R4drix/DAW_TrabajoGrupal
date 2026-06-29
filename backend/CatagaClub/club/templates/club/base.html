@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cataga Club{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: #f5f7fa; }
+        .navbar-brand { font-weight: 700; letter-spacing: 1px; }
+        .card { border: none; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+        .badge-estado-activa { background: #198754; }
+        .badge-estado-finalizada { background: #6c757d; }
+        .badge-estado-cancelada { background: #dc3545; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'club:home' %}">🏨 Cataga Club</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'club:habitacion_lista' %}">Habitaciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'club:cliente_lista' %}">Clientes</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'club:reserva_lista' %}">Reservas</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'club:consumo_lista' %}">Consumos</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><span class="nav-link">👤 {{ user.username }}</span></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-light btn-sm" type="submit">Salir</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Ingresar</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    {% if messages %}
+        {% for m in messages %}
+            <div class="alert alert-{{ m.tags|default:'info' }} alert-dismissible fade show">
+                {{ m }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="text-center text-muted py-4 mt-5">
+    <small>Cataga Club &copy; {% now "Y" %} — Sistema de gestión integral</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends 'club/base.html' %}
+{% block title %}Habitación #{{ habitacion.numero }}{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h2>Habitación #{{ habitacion.numero }}</h2>
+    <hr>
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Tipo</dt>
+        <dd class="col-sm-9">{{ habitacion.get_tipo_display }}</dd>
+        <dt class="col-sm-3">Precio por noche</dt>
+        <dd class="col-sm-9">${{ habitacion.precio_por_noche }}</dd>
+        <dt class="col-sm-3">Capacidad</dt>
+        <dd class="col-sm-9">{{ habitacion.capacidad }} persona(s)</dd>
+        <dt class="col-sm-3">Estado</dt>
+        <dd class="col-sm-9">
+            {% if habitacion.esta_ocupada %}
+                <span class="badge bg-danger">Ocupada</span>
+            {% else %}
+                <span class="badge bg-success">Disponible</span>
+            {% endif %}
+        </dd>
+    </dl>
+</div>
+<a href="{% url 'club:habitacion_lista' %}" class="btn btn-link mt-3">← Volver al listado</a>
+{% endblock %}

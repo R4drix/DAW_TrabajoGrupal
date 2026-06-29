@@ -1,0 +1,16 @@
+.encabezado-pagina {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.etiqueta-oro {
+  color: #b8923a;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+table {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+}
