@@ -14,8 +14,8 @@ proyecto, qué se hizo, cómo se hizo y qué falta.
 | `main` | Estructura inicial (Angular + Django + readme del compañero) | base |
 | `FrontendShovi`, `ramitaD` | Trabajo del compañero en frontend Angular | paralelo |
 | `feat-modelos` | Modelos + CRUD inicial de tu compañero (en `gestion_wellness`) | sustituida |
-| `fix/rename-app-bug` | Renombre `gestion_wellness` → `club`, fix del bug, signals, auth | ✅ mergeada en feat/frontend-api-client |
-| `feat/frontend-api-client` | Cliente Angular consumiendo la API + CORS + 3 vistas nuevas | ✅ actual |
+| `fix/rename-app-bug` | Renombre `gestion_wellness` → `club`, fix del bug, signals, auth | mergeada en feat/frontend-api-client |
+| `feat/frontend-api-client` | Cliente Angular consumiendo la API + CORS + 3 vistas nuevas | actual |
 
 ---
 

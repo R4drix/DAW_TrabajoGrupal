@@ -1,4 +1,4 @@
-# 📋 Cosas que faltan por hacer
+# Cosas que faltan por hacer
 
 Checklist de tareas pendientes para el proyecto Cataga Club. Cada item
 tiene puntaje según la rúbrica del profesor y la rama Git sugerida
@@ -6,7 +6,7 @@ para pair programming con tu compañero.
 
 ---
 
-## 🎯 Opcionales de la rúbrica (+7 pts)
+## Opcionales de la rúbrica (+7 pts)
 
 Estos son los puntos extra que pide el profesor. Son **opcionales**
 pero suman a la nota final.
@@ -21,7 +21,7 @@ pero suman a la nota final.
 
 ---
 
-## 🚀 Mejoras funcionales (no puntúan, pero valen la pena)
+## Mejoras funcionales (no puntúan, pero valen la pena)
 
 Estas mejoras no aparecen explícitamente en la rúbrica pero hacen
 que la app sea más completa, usable y presentable para la
@@ -52,7 +52,7 @@ exposición.
 
 ---
 
-## 🧪 Calidad y testing
+## Calidad y testing
 
 | # | Tarea | Descripción | Rama sugerida |
 |---|---|---|---|
@@ -63,7 +63,7 @@ exposición.
 
 ---
 
-## 🧹 Limpieza técnica
+## Limpieza técnica
 
 | # | Tarea | Descripción | Rama sugerida |
 |---|---|---|---|
@@ -75,7 +75,7 @@ exposición.
 
 ---
 
-## 📚 Documentación
+## Documentación
 
 | # | Tarea | Descripción | Rama sugerida |
 |---|---|---|---|
@@ -86,7 +86,7 @@ exposición.
 
 ---
 
-## 🎤 Para la exposición
+## Para la exposición
 
 | # | Tarea | Descripción |
 |---|---|---|
@@ -96,7 +96,7 @@ exposición.
 
 ---
 
-## 📊 Resumen de puntaje potencial
+## Resumen de puntaje potencial
 
 | Categoría | Pts |
 |---|---|
@@ -112,25 +112,10 @@ profesor aunque no sumen puntos explícitos.
 
 ---
 
-## 🔀 Orden sugerido de ejecución
+## Orden sugerido de ejecución
 
 1. **`feat/pdf-report`** — chico, visible, +2 pts seguros
 2. **`feat/email-notifications`** — chico, +2 pts
 3. **`feat/deploy`** — más trabajo pero +3 pts y visibilidad real
 4. Mejoras Angular (CRUD desde UI, login, charts) — opcional pero impresiona
 5. Tests y limpieza — al final, antes de la entrega
-
----
-
-## 🤔 Decisiones pendientes para vos
-
-Antes de arrancar, definí con tu compañero:
-
-- [ ] ¿Quién hace cada rama? (pair programming real = los dos en videollamada)
-- [ ] ¿En qué orden las atacan? (¿empezamos por PDF o por deploy?)
-- [ ] ¿Van a desplegar? Si sí, ¿en qué plataforma? (Render es lo más fácil)
-- [ ] ¿Qué servicio de email usan? (Gmail con app password, SendGrid, Mailgun)
-- [ ] ¿Quieren hacer el deploy con Docker o sin Docker?
-- [ ] ¿Van a usar `pytest` o los tests nativos de Django?
-
-Marcá las decisiones en este archivo o en issues de GitHub para no olvidarlas.
