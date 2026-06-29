@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuenta — Reserva #{{ reserva.pk }}</title>
+    <style>
+        body { font-family: sans-serif; padding: 24px; }
+        h1 { color: #198754; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { padding: 8px; border-bottom: 1px solid #ccc; text-align: left; }
+        .total { font-size: 1.4em; color: #198754; }
+    </style>
+</head>
+<body>
+    <h1>Cataga Club — Cuenta de Reserva</h1>
+    <p>Reserva #{{ reserva.pk }} · Generada: {{ ahora|date:"d/m/Y H:i" }}</p>
+    <p><strong>Cliente:</strong> {{ reserva.cliente.nombre }} ({{ reserva.cliente.email|default:"-" }})</p>
+    <p><strong>Habitación:</strong> #{{ reserva.habitacion.numero }} — {{ reserva.habitacion.tipo }}</p>
+    <p><strong>Estadía:</strong> {{ reserva.fecha_checkin }} → {{ reserva.fecha_checkout }} ({{ reserva.noches }} noches)</p>
+
+    <h3>Hospedaje</h3>
+    <table>
+        <tr><th>Concepto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr>
+        <tr>
+            <td>Habitación #{{ reserva.habitacion.numero }}</td>
+            <td>{{ reserva.noches }} noche(s)</td>
+            <td>${{ reserva.habitacion.precio_por_noche }}</td>
+            <td>${{ reserva.habitacion.precio_por_noche|stringformat:"f"|slice:":10" }}</td>
+        </tr>
+    </table>
+
+    <h3>Consumos del restaurante</h3>
+    <table>
+        <tr><th>Plato</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr>
+        {% for c in reserva.cliente.consumos_restaurante.all %}
+            <tr>
+                <td>{{ c.descripcion_plato }}</td>
+                <td>{{ c.cantidad }}</td>
+                <td>${{ c.precio }}</td>
+                <td>${{ c.subtotal }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4">Sin consumos.</td></tr>
+        {% endfor %}
+    </table>
+
+    <p class="total"><strong>TOTAL ACUMULADO: ${{ reserva.total_acumulado }}</strong></p>
+</body>
+</html>

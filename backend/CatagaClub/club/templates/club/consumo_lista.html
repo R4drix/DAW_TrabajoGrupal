@@ -1,0 +1,37 @@
+{% extends 'club/base.html' %}
+{% block title %}Consumos · Cataga Club{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-cup-hot"></i> Consumos del restaurante</h2>
+    <a href="{% url 'club:consumo_crear' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Registrar consumo
+    </a>
+</div>
+
+<div class="card p-3">
+    <table class="table align-middle mb-0">
+        <thead>
+            <tr><th>Cliente</th><th>Plato</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th>Fecha</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for c in consumos %}
+                <tr>
+                    <td>{{ c.cliente.nombre }}</td>
+                    <td>{{ c.descripcion_plato }}</td>
+                    <td>${{ c.precio }}</td>
+                    <td>{{ c.cantidad }}</td>
+                    <td><strong>${{ c.subtotal }}</strong></td>
+                    <td><small class="text-muted">{{ c.fecha|date:"d/m/Y H:i" }}</small></td>
+                    <td class="text-end">
+                        <a href="{% url 'club:consumo_borrar' c.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center text-muted">No hay consumos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
