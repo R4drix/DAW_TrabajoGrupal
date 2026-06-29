@@ -19,20 +19,28 @@
     <div class="section-label">El circuito</div>
     <h2 class="section-title">Espacios de Bienestar</h2>
   </div>
-
-  <div class="cards">
-    @for (camara of camaras; track camara) {
+  @if (!loading()) {
+    <div class="cards">
+      @for (camara of camaras; track camara) {
         <div class="card" routerLink="{{camara.id}}">
-            
-            <span class="card-icon">
-              <i class="ti ti-{{camara.icon_class}}" aria-hidden="true"></i>
-            </span>
-            <h3>{{camara.tipo}}</h3>
-            <div class="card-line"></div>
-            <p>{{camara.descripcion}}</p>
+          <span class="card-icon">
+            <i class="ti ti-{{camara.icon_class}}" aria-hidden="true"></i>
+          </span>
+          <h3>{{camara.tipo}}</h3>
+          <div class="card-line"></div>
+          <p>{{camara.descripcion}}</p>
         </div>
-    }
-  </div>
+      } @empty {
+          <div class="card" style="grid-column: 1/-1">
+            <p>No hay camaras disponibles</p>
+          </div>
+      }
+    </div>
+  } @else {
+    <div>
+      <p>{{errorMsg}}</p>
+    </div>
+  }
 
 </section>
 

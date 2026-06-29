@@ -1,15 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, inject, /*OnInit,*/ signal } from '@angular/core';
 import { RouterLink } from "@angular/router";
 
 import { Camara } from '../../services/models';
+import { ApiService } from '../../services/api.service';
 @Component({
   selector: 'app-sauna',
   imports: [RouterLink],
   templateUrl: './sauna.html',
   styleUrl: './sauna.css',
 })
-export class Sauna {
-  public camaras: Camara[] = [
+export class Sauna /*implements OnInit*/ {
+  private readonly api = inject(ApiService);
+  //camaras: Camara[] = [];
+  loading = signal(false); // False por el momento
+  errorMsg = 'No se pudo cargar las camaras del sauna';
+
+  /*
+  ngOnInit(): void {
+    this.api.getCamaras().subscribe({
+      next: (resp: any) => {
+        this.camaras = resp.camaras ?? [];
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+        this.errorMsg = `No se pudo conectar con el backend (${err.status ?? 'sin status'}). Verifica que Django esté corriendo en :8765.`;
+        this.loading.set(false);
+      },
+    })
+  } Esto se usara cuando se implemente el endpoint de Camaras de sauna
+  */
+  
+  camaras: Camara[] = [
     {
       id: 1,
       tipo: "Sauna Seco",
