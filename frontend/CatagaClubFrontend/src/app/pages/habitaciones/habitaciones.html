@@ -1,49 +1,59 @@
 <section class="seccion-habitaciones">
-  
   <div class="encabezado-pagina">
     <div class="etiqueta-oro">Tu Experiencia Cátaga</div>
     <h1 class="titulo-pagina">Nuestras Habitaciones y Suites</h1>
-    <p class="subtitulo-pagina">Espacios diseñados al detalle para tu descanso y privacidad en Cayma.</p>
+    <p class="subtitulo-pagina">
+      Datos en vivo desde la API del backend (<code>/club/api/estado/</code>).
+    </p>
   </div>
 
-  <div class="lista-habitaciones">
-    
-    <div *ngFor="let h of habitaciones; let i = index" class="tarjeta-habitacion">
-      
-      <div class="bloque-imagen">
-        <img [src]="h.fotos && h.fotos.length > 0 ? h.fotos[0] : 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1000'" [alt]="h.nombre">
-        <span class="numero-fondo">0{{ i + 1 }}</span>
-      </div>
+  <div *ngIf="loading" class="alert alert-info">Cargando habitaciones desde el servidor...</div>
 
-      <div class="bloque-contenido">
-        
-        <div class="encabezado-tarjeta">
-          <h2>{{ h.nombre }}</h2>
-          <div class="linea-oro-corta"></div>
-        </div>
+  <div *ngIf="errorMsg" class="alert alert-danger">
+    {{ errorMsg }}
+  </div>
 
-        <p class="descripcion-habitacion">
-          {{ h.descripcion }}
-        </p>
-
-        <div class="bloque-tarifas">
-          <h4>Precios y Horarios</h4>
-          <div class="tabla-tarifas">
-            <div class="fila-tarifa" *ngFor="let tarifa of h.tarifas">
-              <span class="tiempo"><i class="ti ti-clock"></i> {{ tarifa.tiempo }}</span>
-              <span class="precio">S/ {{ tarifa.precio | number:'1.2-2' }}</span>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn-reserva-premium">
-          <i class="ti ti-calendar-check"></i> Reservar {{ h.nombre }}
+  <div *ngIf="!loading && !errorMsg" class="row">
+    <div class="col-md-4">
+      <div class="list-group">
+        <button
+          *ngFor="let h of habitaciones"
+          type="button"
+          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          [class.active]="habitacionSeleccionada?.id === h.id"
+          (click)="seleccionarHabitacion(h)"
+        >
+          <span>
+            <strong>Habitación #{{ h.numero }}</strong>
+            <small class="d-block text-muted">{{ h.tipo }}</small>
+          </span>
+          <span *ngIf="h.esta_ocupada" class="badge bg-danger rounded-pill">Ocupada</span>
+          <span *ngIf="!h.esta_ocupada" class="badge bg-success rounded-pill">Libre</span>
         </button>
-
       </div>
-
     </div>
 
+    <div class="col-md-8">
+      <div *ngIf="habitacionSeleccionada; else sinSeleccion" class="card p-4">
+        <h2>Habitación #{{ habitacionSeleccionada.numero }}</h2>
+        <hr />
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Tipo</dt>
+          <dd class="col-sm-8">{{ habitacionSeleccionada.tipo }}</dd>
+          <dt class="col-sm-4">Precio por noche</dt>
+          <dd class="col-sm-8">$ {{ habitacionSeleccionada.precio_por_noche }}</dd>
+          <dt class="col-sm-4">Capacidad</dt>
+          <dd class="col-sm-8">{{ habitacionSeleccionada.capacidad }} persona(s)</dd>
+          <dt class="col-sm-4">Estado</dt>
+          <dd class="col-sm-8">
+            <span *ngIf="habitacionSeleccionada.esta_ocupada" class="badge bg-danger">Ocupada</span>
+            <span *ngIf="!habitacionSeleccionada.esta_ocupada" class="badge bg-success">Disponible</span>
+          </dd>
+        </dl>
+      </div>
+      <ng-template #sinSeleccion>
+        <div class="alert alert-secondary">Selecciona una habitación del listado.</div>
+      </ng-template>
+    </div>
   </div>
-
 </section>

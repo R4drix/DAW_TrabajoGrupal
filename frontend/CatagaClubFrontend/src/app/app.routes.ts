@@ -4,22 +4,32 @@ import { Home } from './pages/home/home';
 import { Habitaciones } from './pages/habitaciones/habitaciones';
 import { Sauna } from './pages/sauna/sauna';
 import { Nosotros } from './pages/nosotros/nosotros';
+import { DashboardComponent } from './pages/dashboard/dashboard';
+import { Reservas } from './pages/reservas/reservas';
 
 export const routes: Routes = [
   {
     path: '',
-    component: Home
+    component: Home,
   },
   {
     path: 'habitaciones',
-    component: Habitaciones
+    component: Habitaciones,
   },
   {
     path: 'sauna',
-    component: Sauna
+    component: Sauna,
   },
   {
     path: 'nosotros',
-    component : Nosotros
+    component: Nosotros,
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+  },
+  {
+    path: 'reservas',
+    component: Reservas,
   },
 ];

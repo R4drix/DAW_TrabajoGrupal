@@ -1,0 +1,46 @@
+<section>
+  <div class="encabezado-pagina">
+    <div class="etiqueta-oro">Panel de control</div>
+    <h1 class="titulo-pagina">Dashboard del Cataga Club</h1>
+    <p class="subtitulo-pagina">
+      Métricas en vivo obtenidas con <code>HttpClient</code> desde <code>/club/api/dashboard/</code>.
+    </p>
+  </div>
+
+  <div *ngIf="loading" class="alert alert-info">Cargando métricas...</div>
+  <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+
+  <div *ngIf="data" class="row g-4">
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <h6 class="text-muted">Clientes registrados</h6>
+        <h2>{{ data.clientes }}</h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <h6 class="text-muted">Habitaciones totales</h6>
+        <h2>{{ data.habitaciones_total }}</h2>
+        <small class="text-success">{{ data.habitaciones_ocupadas }} ocupadas</small>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <h6 class="text-muted">Reservas activas</h6>
+        <h2>{{ data.reservas_activas }}</h2>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-4 text-center">
+        <h6 class="text-muted">Ingresos restaurante (hoy)</h6>
+        <h2>$ {{ data.ingresos_restaurante_hoy }}</h2>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-4 text-center">
+        <h6 class="text-muted">Consumos del día</h6>
+        <h2>{{ data.consumos_hoy }}</h2>
+      </div>
+    </div>
+  </div>
+</section>
