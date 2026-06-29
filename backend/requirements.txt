@@ -1,3 +1,14 @@
 asgiref==3.11.1
 Django==6.0.6
 sqlparse==0.5.5
+
+# Generación de PDF
+xhtml2pdf==0.2.17
+
+# Producción / PostgreSQL
+psycopg2-binary
+gunicorn==23.0.0
+whitenoise==6.8.2
+
+# CORS para Angular
+django-cors-headers==4.6.0
