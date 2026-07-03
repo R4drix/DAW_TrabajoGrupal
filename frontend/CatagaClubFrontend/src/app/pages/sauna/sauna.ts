@@ -14,6 +14,7 @@ export class Sauna /*implements OnInit*/ {
   //camaras: Camara[] = [];
   loading = signal(false); // False por el momento
   errorMsg = 'No se pudo cargar las camaras del sauna';
+  camaraSeleccionada: Camara | null = null
 
   /*
   ngOnInit(): void {
@@ -60,4 +61,7 @@ export class Sauna /*implements OnInit*/ {
       icon_class: "user-check",
     },
   ]
+  public seleccionarCamara(camara: Camara):void {
+    this.camaraSeleccionada = camara;
+  }
 }
