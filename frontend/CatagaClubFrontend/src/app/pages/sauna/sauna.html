@@ -22,7 +22,12 @@
   @if (!loading()) {
     <div class="cards">
       @for (camara of camaras; track camara) {
-        <div class="card" routerLink="{{camara.id}}" (click)="seleccionarCamara(camara)">
+        <div
+          class="card"
+          routerLink="{{camara.id}}"
+          (mouseenter)="select(camara)"
+          (mouseleave)="deselect()"
+        >
           <span class="card-icon">
             <i class="ti ti-{{camara.icon_class}}" aria-hidden="true"></i>
           </span>
@@ -37,7 +42,7 @@
       }
     </div>
     <div class="">
-      @if (camaraSeleccionada) {
+      @if (camaraSeleccionada() != null) {
         <div class="card">
           <!--Info de la camaraSelccionada-->
         </div>
