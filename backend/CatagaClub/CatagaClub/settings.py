@@ -10,10 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+from urllib.parse import urlparse
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carga variables de entorno desde backend/.env
+load_dotenv(BASE_DIR.parent / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +31,10 @@ SECRET_KEY = 'django-insecure-b4s)6-0-#l@!kehpv^2k1pd!vzuuw5&f2_d!#hbv3z8=t*_tr%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -75,12 +84,60 @@ WSGI_APPLICATION = 'CatagaClub.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Detecta automáticamente si hay DATABASE_URL (Supabase / producción).
+# Si no existe, usa la configuración clásica con variables de entorno sueltas.
+# Esto te permite seguir corriendo con SQLite localmente si defines USE_SQLITE=1,
+# o apuntar a Supabase definiendo DATABASE_URL.
+
+USE_SQLITE = os.environ.get('USE_SQLITE', '0') == '1'
+
+if USE_SQLITE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+
+    if DATABASE_URL:
+        # Parseo estilo dj-database-url (sin agregar dependencia extra).
+        # Formato esperado: postgres://USER:PASSWORD@HOST:PORT/DBNAME
+        url = urlparse(DATABASE_URL)
+
+        # Supabase a veces usa 'postgres://' o 'postgresql://'; ambos funcionan.
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': url.path.lstrip('/'),
+                'USER': url.username,
+                'PASSWORD': url.password,
+                'HOST': url.hostname,
+                'PORT': url.port or 5432,
+                # Opciones útiles para Supabase (usa connection pooler o directo).
+                'CONN_MAX_AGE': 60,
+                'OPTIONS': {
+                    'connect_timeout': 10,
+                },
+            }
+        }
+    else:
+        # Fallback a variables de entorno sueltas (por si no defines DATABASE_URL).
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.environ.get('PGDATABASE', 'postgres'),
+                'USER': os.environ.get('PGUSER', 'postgres'),
+                'PASSWORD': os.environ.get('PGPASSWORD', ''),
+                'HOST': os.environ.get('PGHOST', 'localhost'),
+                'PORT': os.environ.get('PGPORT', '5432'),
+                'CONN_MAX_AGE': 60,
+                'OPTIONS': {
+                    'connect_timeout': 10,
+                },
+            }
+        }
 
 
 # Password validation
