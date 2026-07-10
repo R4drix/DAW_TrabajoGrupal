@@ -1,0 +1,31 @@
+.sidebar-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #1f1f23;
+  background-color: #111113;
+  font-size: 0.8rem;
+  color: #71717a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #22c55e;
+}
+.version-label {
+  font-family: monospace;
+  color: rgba(212, 175, 55, 0.5);
+}

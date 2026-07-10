@@ -1,1 +1,94 @@
-<p>admin-dashboard works!</p>
+<div class="admin-container">
+  <header class="admin-header">
+    <div class="header-titles">
+      <h1>Panel de Conserjería</h1>
+      <p>Gestión de Experiencias y Reservas de Alta Gama</p>
+    </div>
+    <div class="status-badge-live">• Conectado a Cataga-DB</div>
+  </header>
+
+  <section class="summary-cards">
+    <div class="card">
+      <span class="card-icon">👑</span>
+      <div class="card-data">
+        <h3>{{ totalReservas }}</h3>
+        <p>Solicitudes Activas</p>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🛏️</span>
+      <div class="card-data">
+        <h3>{{ totalHabitaciones }}</h3>
+        <p>Suites Disponibles</p>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🍾</span>
+      <div class="card-data">
+        <h3>{{ totalConsumos }}</h3>
+        <p>Experiencias Menú</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="dashboard-content">
+    <div class="premium-list-container">
+      <div class="list-header">
+        <h2>Solicitudes de Reserva Recientes</h2>
+        <span class="subtitle">Tratamiento VIP & Asignación de Espacios</span>
+      </div>
+
+      <div class="premium-list">
+        <div class="premium-item" *ngFor="let item of recientes">
+          <div class="vip-indicator" [ngClass]="item.estado"></div>
+          
+          <div class="item-main-info">
+            <span class="guest-label">Huésped / Cliente</span>
+            <h4 class="guest-name">{{ item.nombre || item.cliente_nombre }}</h4>
+            <span class="booking-id">ID Reserva: #{{ item.id }}</span>
+          </div>
+
+          <div class="item-details">
+            <div class="detail-group">
+              <span class="detail-icon">📅</span>
+              <div>
+                <p class="detail-title">Fecha Solicitada</p>
+                <p class="detail-value">{{ item.fecha }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="item-actions-status">
+            <span class="premium-badge" [ngClass]="item.estado">
+              {{ item.estado || 'Pendiente' }}
+            </span>
+            <div class="action-buttons">
+              <button class="btn-approve" title="Aceptar Reserva">✓</button>
+              <button class="btn-reject" title="Declinar">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-premium-state" *ngIf="recientes.length === 0">
+          <div class="empty-icon">💎</div>
+          <p>No hay solicitudes pendientes en la lista de espera.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="quick-nav">
+      <h3>Secciones de Gestión</h3>
+      <nav class="nav-menu">
+        <a routerLink="/admin/registros" class="nav-item">
+          <span class="nav-icon">📅</span> Gestionar Reservas
+        </a>
+        <a routerLink="/admin/habitaciones" class="nav-item">
+          <span class="nav-icon">🏨</span> Control de Suites
+        </a>
+        <a routerLink="/admin/comidas" class="nav-item">
+          <span class="nav-icon">🍽️</span> Carta del Restaurante
+        </a>
+      </nav>
+    </aside>
+  </main>
+</div>
