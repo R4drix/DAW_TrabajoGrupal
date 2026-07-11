@@ -1,0 +1,413 @@
+{% extends "club/base.html" %}
+{% block title %}Nueva Reserva{% endblock %}
+
+{% block content %}
+<div class="wizard-container">
+
+  <!-- BARRA DE PASOS -->
+  <div class="wizard-steps">
+    <div class="step">
+      <div class="step-circle active" id="circle-1">1</div>
+      <span class="step-label">Habitación</span>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step">
+      <div class="step-circle" id="circle-2">2</div>
+      <span class="step-label">Fechas</span>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step">
+      <div class="step-circle" id="circle-3">3</div>
+      <span class="step-label">Confirmación</span>
+    </div>
+  </div>
+
+  <form method="post" id="reserva-form">
+    {% csrf_token %}
+    <!-- Campo oculto: el cliente es el usuario logueado, se asigna en la vista -->
+    <input type="hidden" name="habitacion" id="hidden-habitacion">
+    <input type="hidden" name="fecha_checkin" id="hidden-checkin">
+    <input type="hidden" name="fecha_checkout" id="hidden-checkout">
+    <input type="hidden" name="estado" value="activa">
+
+    <!-- ══════════════════════════════════════
+         PASO 1 — Elegir habitación
+    ══════════════════════════════════════ -->
+    <div class="wizard-panel active" id="panel-1">
+      <h2 class="panel-title">Elige tu habitación</h2>
+      <p class="panel-subtitle">Selecciona el tipo de habitación que mejor se adapte a ti.</p>
+
+      <!-- Filtros rápidos -->
+      <div class="filtros">
+        <button type="button" class="filtro-btn active" onclick="filtrarTipo('todos', this)">Todas</button>
+        <button type="button" class="filtro-btn" onclick="filtrarTipo('Individual', this)">Individual</button>
+        <button type="button" class="filtro-btn" onclick="filtrarTipo('Doble', this)">Doble</button>
+        <button type="button" class="filtro-btn" onclick="filtrarTipo('Suite', this)">Suite</button>
+        <button type="button" class="filtro-btn" onclick="filtrarTipo('Familiar', this)">Familiar</button>
+      </div>
+
+      <!-- Tarjetas de habitaciones -->
+      <div class="habitaciones-grid" id="habitaciones-grid">
+        {% for h in habitaciones %}
+        <div class="hab-card {% if h.esta_ocupada %}ocupada{% endif %}"
+             data-id="{{ h.id }}"
+             data-tipo="{{ h.tipo }}"
+             data-precio="{{ h.precio_por_noche }}"
+             data-capacidad="{{ h.capacidad }}"
+             data-numero="{{ h.numero }}"
+             onclick="{% if not h.esta_ocupada %}seleccionarHabitacion(this){% endif %}">
+          <div class="hab-header">
+            <span class="hab-tipo">{{ h.tipo }}</span>
+            <span class="hab-numero">Nº {{ h.numero }}</span>
+          </div>
+          <div class="hab-precio">S/ {{ h.precio_por_noche }} <small>/ noche</small></div>
+          <div class="hab-detalle">
+            <span>👥 {{ h.capacidad }} personas</span>
+            {% if h.esta_ocupada %}
+              <span class="badge-ocupada">Ocupada</span>
+            {% else %}
+              <span class="badge-libre">Disponible</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="wizard-nav" style="justify-content:flex-end;">
+        <button type="button" class="btn-next" id="btn-next-1" onclick="goToStep(2)" disabled>
+          Siguiente → Fechas
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PASO 2 — Fechas
+    ══════════════════════════════════════ -->
+    <div class="wizard-panel" id="panel-2">
+      <h2 class="panel-title">¿Cuándo te quedas?</h2>
+      <p class="panel-subtitle">Selecciona tus fechas de entrada y salida.</p>
+
+      <!-- Resumen habitación elegida -->
+      <div class="hab-seleccionada-banner" id="hab-banner">
+        <span>🏨</span>
+        <div>
+          <strong id="banner-tipo">—</strong>
+          <small id="banner-precio">—</small>
+        </div>
+      </div>
+
+      <div class="dates-grid">
+        <div class="form-group">
+          <label>📅 Check-in</label>
+          <input type="date" id="input-checkin" name="_checkin">
+        </div>
+        <div class="form-group">
+          <label>📅 Check-out</label>
+          <input type="date" id="input-checkout" name="_checkout">
+        </div>
+      </div>
+
+      <div class="noches-resumen" id="noches-resumen" style="display:none;">
+        <span>🌙</span>
+        <span id="noches-texto"></span>
+        <span class="noches-precio" id="noches-precio"></span>
+      </div>
+
+      <div class="field-error" id="fechas-error" style="display:none;margin-top:0.5rem;"></div>
+
+      <div class="wizard-nav">
+        <button type="button" class="btn-back" onclick="goToStep(1)">← Volver</button>
+        <button type="button" class="btn-next" id="btn-next-2" onclick="goToStep(3)" disabled>
+          Siguiente → Confirmar
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PASO 3 — Confirmación
+    ══════════════════════════════════════ -->
+    <div class="wizard-panel" id="panel-3">
+      <h2 class="panel-title">¿Todo correcto?</h2>
+      <p class="panel-subtitle">Revisa los datos antes de confirmar tu reserva.</p>
+
+      <div class="resumen-card">
+        <div class="resumen-row">
+          <span class="resumen-label">👤 Huésped</span>
+          <span class="resumen-value">{{ request.user.get_full_name|default:request.user.username }}</span>
+        </div>
+        <div class="resumen-row">
+          <span class="resumen-label">🏨 Habitación</span>
+          <span class="resumen-value" id="confirm-hab">—</span>
+        </div>
+        <div class="resumen-row">
+          <span class="resumen-label">📅 Check-in</span>
+          <span class="resumen-value" id="confirm-checkin">—</span>
+        </div>
+        <div class="resumen-row">
+          <span class="resumen-label">📅 Check-out</span>
+          <span class="resumen-value" id="confirm-checkout">—</span>
+        </div>
+        <div class="resumen-row">
+          <span class="resumen-label">🌙 Noches</span>
+          <span class="resumen-value" id="confirm-noches">—</span>
+        </div>
+        <div class="resumen-row resumen-total">
+          <span class="resumen-label">💰 Total estimado</span>
+          <span class="resumen-value" id="confirm-total">—</span>
+        </div>
+      </div>
+
+      <div class="wizard-nav">
+        <button type="button" class="btn-back" onclick="goToStep(2)">← Volver</button>
+        <button type="submit" class="btn-confirm" onclick="prepararEnvio()">
+          ✅ Confirmar Reserva
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<style>
+  .wizard-container { max-width: 660px; margin: 2rem auto; padding: 0 1rem; }
+
+  /* PASOS */
+  .wizard-steps { display:flex; align-items:center; justify-content:center; margin-bottom:2.5rem; }
+  .step { display:flex; flex-direction:column; align-items:center; gap:0.35rem; }
+  .step-circle {
+    width:38px; height:38px; border-radius:50%;
+    background:#dee2e6; color:#6c757d;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:1rem; transition:all .3s;
+  }
+  .step-circle.active { background:#0d6efd; color:#fff; box-shadow:0 0 0 4px rgba(13,110,253,.2); }
+  .step-circle.done   { background:#198754; color:#fff; }
+  .step-label { font-size:.72rem; color:#6c757d; font-weight:500; white-space:nowrap; }
+  .step-line  { flex:1; height:3px; background:#dee2e6; margin:0 .5rem 1.3rem; min-width:40px; transition:background .3s; }
+  .step-line.done { background:#198754; }
+
+  /* PANELES */
+  .wizard-panel { display:none; animation:fadeIn .25s ease; }
+  .wizard-panel.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .panel-title { font-size:1.45rem; font-weight:700; margin-bottom:.25rem; }
+  .panel-subtitle { color:#6c757d; font-size:.9rem; margin-bottom:1.5rem; }
+
+  /* FILTROS */
+  .filtros { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+  .filtro-btn {
+    padding:.35rem .9rem; border-radius:20px;
+    border:1.5px solid #dee2e6; background:#fff;
+    font-size:.85rem; cursor:pointer; transition:all .2s;
+  }
+  .filtro-btn.active { background:#0d6efd; color:#fff; border-color:#0d6efd; }
+
+  /* TARJETAS HABITACIONES */
+  .habitaciones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+  .hab-card {
+    border:2px solid #dee2e6; border-radius:12px;
+    padding:1rem; cursor:pointer; transition:all .2s;
+    background:#fff;
+  }
+  .hab-card:hover:not(.ocupada)   { border-color:#0d6efd; box-shadow:0 4px 12px rgba(13,110,253,.15); transform:translateY(-2px); }
+  .hab-card.seleccionada { border-color:#0d6efd; background:#f0f7ff; }
+  .hab-card.ocupada { opacity:.5; cursor:not-allowed; }
+  .hab-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; }
+  .hab-tipo { font-weight:700; font-size:.95rem; }
+  .hab-numero { font-size:.8rem; color:#6c757d; }
+  .hab-precio { font-size:1.15rem; font-weight:700; color:#0d6efd; margin-bottom:.5rem; }
+  .hab-precio small { font-size:.75rem; font-weight:400; color:#6c757d; }
+  .hab-detalle { display:flex; justify-content:space-between; align-items:center; font-size:.8rem; }
+  .badge-libre   { background:#d1e7dd; color:#0f5132; padding:.15rem .5rem; border-radius:20px; font-size:.75rem; }
+  .badge-ocupada { background:#f8d7da; color:#842029; padding:.15rem .5rem; border-radius:20px; font-size:.75rem; }
+
+  /* BANNER HAB SELECCIONADA */
+  .hab-seleccionada-banner {
+    display:flex; align-items:center; gap:1rem;
+    background:#f0f7ff; border:1.5px solid #b6d4fe;
+    border-radius:10px; padding:.8rem 1.1rem; margin-bottom:1.3rem;
+    font-size:1.4rem;
+  }
+  .hab-seleccionada-banner div { display:flex; flex-direction:column; gap:.15rem; }
+  .hab-seleccionada-banner strong { font-size:.95rem; }
+  .hab-seleccionada-banner small { color:#0d6efd; font-weight:600; font-size:.85rem; }
+
+  /* FECHAS */
+  .dates-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form-group { margin-bottom:1rem; }
+  .form-group label { display:block; font-weight:600; font-size:.9rem; color:#495057; margin-bottom:.4rem; }
+  .form-group input[type="date"] {
+    width:100%; padding:.55rem .85rem;
+    border:1.5px solid #ced4da; border-radius:8px;
+    font-size:.95rem; transition:border-color .2s; background:#fff;
+  }
+  .form-group input[type="date"]:focus { border-color:#0d6efd; outline:none; box-shadow:0 0 0 3px rgba(13,110,253,.15); }
+
+  /* RESUMEN NOCHES */
+  .noches-resumen {
+    display:flex; align-items:center; gap:.8rem;
+    background:#fff3cd; border:1.5px solid #ffc107;
+    border-radius:10px; padding:.7rem 1rem;
+    font-weight:600; font-size:.95rem;
+  }
+  .noches-precio { margin-left:auto; color:#0d6efd; }
+
+  /* RESUMEN FINAL */
+  .resumen-card { background:#f8f9fa; border:1.5px solid #dee2e6; border-radius:12px; overflow:hidden; margin-bottom:1.5rem; }
+  .resumen-row { display:flex; justify-content:space-between; align-items:center; padding:.85rem 1.2rem; border-bottom:1px solid #dee2e6; }
+  .resumen-row:last-child { border-bottom:none; }
+  .resumen-label { color:#6c757d; font-size:.9rem; }
+  .resumen-value { font-weight:600; font-size:.95rem; }
+  .resumen-total { background:#e8f5e9; }
+  .resumen-total .resumen-label,
+  .resumen-total .resumen-value { color:#198754; font-size:1rem; }
+
+  /* NAV */
+  .wizard-nav { display:flex; justify-content:space-between; align-items:center; margin-top:2rem; padding-top:1.2rem; border-top:1px solid #dee2e6; }
+  .btn-next, .btn-confirm {
+    background:#0d6efd; color:#fff; border:none;
+    padding:.65rem 1.4rem; border-radius:8px;
+    font-weight:600; font-size:.95rem; cursor:pointer; transition:background .2s;
+  }
+  .btn-next:disabled { background:#adb5bd; cursor:not-allowed; }
+  .btn-next:not(:disabled):hover { background:#0b5ed7; }
+  .btn-confirm { background:#198754; }
+  .btn-confirm:hover { background:#157347; }
+  .btn-back {
+    background:none; border:1.5px solid #ced4da;
+    padding:.65rem 1.2rem; border-radius:8px;
+    font-weight:600; font-size:.95rem; cursor:pointer; color:#495057; transition:all .2s;
+  }
+  .btn-back:hover { background:#f8f9fa; }
+  .field-error { color:#dc3545; font-size:.85rem; }
+</style>
+
+<script>
+  let currentStep = 1;
+  let habSeleccionada = null;
+
+  // ── SELECCIONAR HABITACIÓN ──────────────────────────
+  function seleccionarHabitacion(card) {
+    document.querySelectorAll('.hab-card').forEach(c => c.classList.remove('seleccionada'));
+    card.classList.add('seleccionada');
+    habSeleccionada = {
+      id:       card.dataset.id,
+      tipo:     card.dataset.tipo,
+      numero:   card.dataset.numero,
+      precio:   parseFloat(card.dataset.precio),
+      capacidad: card.dataset.capacidad
+    };
+    document.getElementById('btn-next-1').disabled = false;
+  }
+
+  // ── FILTRAR POR TIPO ──────────────────────────────
+  function filtrarTipo(tipo, btn) {
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.hab-card').forEach(card => {
+      card.style.display = (tipo === 'todos' || card.dataset.tipo === tipo) ? 'block' : 'none';
+    });
+  }
+
+  // ── NAVEGACIÓN ENTRE PASOS ────────────────────────
+  function goToStep(step) {
+    if (step === 2 && !habSeleccionada) {
+      alert('Por favor selecciona una habitación.');
+      return;
+    }
+    if (step === 3) {
+      const ci = document.getElementById('input-checkin').value;
+      const co = document.getElementById('input-checkout').value;
+      const errEl = document.getElementById('fechas-error');
+      if (!ci || !co) {
+        errEl.textContent = 'Por favor selecciona ambas fechas.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (co <= ci) {
+        errEl.textContent = 'El check-out debe ser posterior al check-in.';
+        errEl.style.display = 'block';
+        return;
+      }
+      const hoy = new Date().toISOString().split('T')[0];
+      if (ci < hoy) {
+        errEl.textContent = 'El check-in no puede ser en el pasado.';
+        errEl.style.display = 'block';
+        return;
+      }
+      errEl.style.display = 'none';
+      actualizarResumen();
+    }
+
+    // Actualizar indicadores
+    const prev = currentStep;
+    document.getElementById(`panel-${prev}`).classList.remove('active');
+    document.getElementById(`circle-${prev}`).classList.remove('active');
+
+    if (step > prev) {
+      document.getElementById(`circle-${prev}`).classList.add('done');
+      const line = document.getElementById(`line-${prev}`);
+      if (line) line.classList.add('done');
+    } else {
+      document.getElementById(`circle-${prev}`).classList.remove('done');
+      const line = document.getElementById(`line-${step}`);
+      if (line) line.classList.remove('done');
+    }
+
+    currentStep = step;
+    document.getElementById(`panel-${step}`).classList.add('active');
+    document.getElementById(`circle-${step}`).classList.add('active');
+    document.getElementById(`circle-${step}`).classList.remove('done');
+
+    // Rellenar banner del paso 2
+    if (step === 2 && habSeleccionada) {
+      document.getElementById('banner-tipo').textContent = `${habSeleccionada.tipo} — Hab. ${habSeleccionada.numero}`;
+      document.getElementById('banner-precio').textContent = `S/ ${habSeleccionada.precio.toFixed(2)} / noche · ${habSeleccionada.capacidad} personas`;
+    }
+  }
+
+  // ── CALCULAR NOCHES ───────────────────────────────
+  function calcularNoches() {
+    const ci = document.getElementById('input-checkin').value;
+    const co = document.getElementById('input-checkout').value;
+    const errEl = document.getElementById('fechas-error');
+    errEl.style.display = 'none';
+
+    if (ci && co && co > ci) {
+      const noches = (new Date(co) - new Date(ci)) / (1000 * 60 * 60 * 24);
+      const total  = habSeleccionada ? habSeleccionada.precio * noches : 0;
+      document.getElementById('noches-texto').textContent = `${noches} noche${noches !== 1 ? 's' : ''}`;
+      document.getElementById('noches-precio').textContent = habSeleccionada ? `≈ S/ ${total.toFixed(2)}` : '';
+      document.getElementById('noches-resumen').style.display = 'flex';
+      document.getElementById('btn-next-2').disabled = false;
+    } else {
+      document.getElementById('noches-resumen').style.display = 'none';
+      document.getElementById('btn-next-2').disabled = true;
+    }
+  }
+
+  document.getElementById('input-checkin').addEventListener('change', calcularNoches);
+  document.getElementById('input-checkout').addEventListener('change', calcularNoches);
+
+  // ── ACTUALIZAR RESUMEN PASO 3 ─────────────────────
+  function actualizarResumen() {
+    const ci = document.getElementById('input-checkin').value;
+    const co = document.getElementById('input-checkout').value;
+    const noches = (new Date(co) - new Date(ci)) / (1000 * 60 * 60 * 24);
+    const total  = habSeleccionada.precio * noches;
+
+    document.getElementById('confirm-hab').textContent      = `${habSeleccionada.tipo} — Hab. ${habSeleccionada.numero}`;
+    document.getElementById('confirm-checkin').textContent  = ci;
+    document.getElementById('confirm-checkout').textContent = co;
+    document.getElementById('confirm-noches').textContent   = `${noches} noche${noches !== 1 ? 's' : ''}`;
+    document.getElementById('confirm-total').textContent    = `S/ ${total.toFixed(2)}`;
+  }
+
+  // ── PREPARAR ENVÍO ────────────────────────────────
+  function prepararEnvio() {
+    document.getElementById('hidden-habitacion').value = habSeleccionada.id;
+    document.getElementById('hidden-checkin').value    = document.getElementById('input-checkin').value;
+    document.getElementById('hidden-checkout').value   = document.getElementById('input-checkout').value;
+  }
+</script>
+{% endblock %}
