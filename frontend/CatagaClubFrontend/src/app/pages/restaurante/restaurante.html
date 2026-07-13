@@ -1,0 +1,64 @@
+<section class="section-hero">
+    <div>
+        <div class="hero-eyebrow">Cocina Nikkei de autor</div>
+    <h1>RESTAURANTE</h1>
+    <h3>Una experiencia gastronómica inolvidable</h3>
+    <p>
+        Fusión de sabores peruanos en un ambiente elegante, pensado para disfrutar cada detalle.
+    </p>
+    </div>
+</section>
+
+<section class="reserva" id="reserva">
+
+    <div class="hero-eyebrow">Reservas</div>
+    <h1>Reserva tu mesa</h1>
+
+    <form class="form-reserva" [formGroup]="reservaForm" (ngSubmit)="buscarMesas()">
+        <div class="form-field">
+            <label for="fecha">Fecha</label>
+            <input id="fecha" type="date" formControlName="fecha">
+        </div>
+
+        <div class="form-field">
+            <label for="hora">Hora</label>
+            <input id="hora" type="time" formControlName="hora">
+        </div>
+
+        <div class="form-field">
+            <label for="personas">Personas</label>
+            <input id="personas" type="number" min="1" max="20" formControlName="personas">
+        </div>
+
+        <button class="btn-hero" type="submit" [disabled]="cargando()">
+            @if (cargando()) { Consultando... } @else { Consultar disponibilidad }
+        </button>
+    </form>
+
+    @if (cargando()) {
+        <h3>Consultando las mesas disponibles...</h3>
+    }
+    @else if (error()) {
+        <h3 class="reserva-mensaje reserva-error">{{ error() }}</h3>
+    }
+    @else if (mesas() === null) {
+        <h3 class="reserva-mensaje">Elige fecha, hora y número de personas para consultar las mesas disponibles.</h3>
+    }
+    @else if (mesas()!.length === 0) {
+        <h3 class="reserva-mensaje">No hay mesas disponibles para lo que buscas. Prueba con otra fecha u horario.</h3>
+    }
+    @else {
+        <div class="mesas-grid">
+            @for (mesa of mesas(); track mesa.numero) {
+                <div class="card">
+                    <span class="mesa-numero">Mesa {{ mesa.numero }}</span>
+                    <span class="mesa-capacidad">Capacidad para {{ mesa.capacidad }} personas</span>
+                    @if (mesa.ubicacion) {
+                        <span class="mesa-ubicacion">{{ mesa.ubicacion }}</span>
+                    }
+                    <button class="btn-hero" type="button" (click)="seleccionarMesa(mesa)">Reservar esta mesa</button>
+                </div>
+            }
+        </div>
+    }
+</section>
