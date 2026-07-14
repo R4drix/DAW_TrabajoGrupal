@@ -14,6 +14,7 @@ urlpatterns = [
     path('habitaciones/<int:pk>/',             views.HabitacionDetailView.as_view(), name='habitacion_detalle'),
     path('habitaciones/<int:pk>/editar/',      views.HabitacionUpdateView.as_view(), name='habitacion_editar'),
     path('habitaciones/<int:pk>/borrar/',      views.HabitacionDeleteView.as_view(), name='habitacion_borrar'),
+    path('api/estado-habitaciones/',           views.estado_habitaciones_api,        name='estado_habitaciones_api'),
 
     # Clientes
     path('clientes/',                          views.ClienteListView.as_view(),      name='cliente_lista'),

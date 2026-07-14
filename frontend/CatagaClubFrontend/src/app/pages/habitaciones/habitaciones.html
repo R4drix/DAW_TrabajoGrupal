@@ -2,33 +2,88 @@
   <div class="encabezado-pagina">
     <div class="etiqueta-oro">Tu Experiencia Cátaga</div>
     <h1 class="titulo-pagina">Nuestras Habitaciones y Suites</h1>
-    <!-- <p class="subtitulo-pagina"> -->
-    <!--   Datos en vivo desde la API del backend (<code>/club/api/estado/</code>). -->
-    <!-- </p> -->
   </div>
+
   @if (loading()) {
-    <div class="alert alert-info">Cargando habitaciones desde el servidor...</div>
-    <div class="alert alert-danger">{{errorMsg}}</div>
+    <div class="alert alert-info">Cargando catálogo...</div>
   } @else {
-    @if (destacadas.length > 0) {
-      <div class="galeria-destacada">
-        @for (h of destacadas; track h.id) {
-          <div class="foto-destacada">
-            <img
-              [src]="imagenDe(h)"
-              [alt]="'Habitación ' + h.numero + ' - ' + h.tipo"
-              loading="lazy"
-              (error)="onImgError($event)"
-            />
-            <div class="foto-destacada-info">
-              <span class="foto-destacada-tipo">{{ h.tipo }}</span>
-              <span class="foto-destacada-numero">Hab. #{{ h.numero }}</span>
+    
+    <div class="lista-habitaciones">
+      @for (h of habitaciones; track h.id) {
+        <article class="tarjeta-habitacion">
+          
+          <div class="bloque-galeria-multi">
+            
+            <div class="bloque-imagen-principal">
+              <img [src]="h.imagen_principal || placeholders.principal" 
+                   (error)="onImgError($event, 'principal')" 
+                   [alt]="h.tipo" 
+                   class="img-main"/>
+              <span class="numero-fondo">#{{ h.numero }}</span>
+              <span class="badge-estado" [class.ocupada]="h.esta_ocupada">
+                {{ h.esta_ocupada ? 'Ocupada' : 'Disponible' }}
+              </span>
             </div>
+            
+            <div class="bloque-miniaturas">
+              <div class="miniatura-item">
+                <img [src]="h.imagen_cama || placeholders.cama" 
+                     (error)="onImgError($event, 'cama')" 
+                     alt="Cama"/>
+                <span class="etiqueta-foto">Dormitorio</span>
+              </div>
+              
+              <div class="miniatura-item">
+                <img [src]="h.imagen_bano || placeholders.bano" 
+                     (error)="onImgError($event, 'bano')" 
+                     alt="Baño"/>
+                <span class="etiqueta-foto">Baño</span>
+              </div>
+              
+              <div class="miniatura-item">
+                <img [src]="h.imagen_extra || placeholders.extra" 
+                     (error)="onImgError($event, 'extra')" 
+                     alt="Extras"/>
+                <span class="etiqueta-foto">Detalles</span>
+              </div>
+            </div>
+
           </div>
-        }
-      </div>
-    } @else {
-      <div class="alert alert-secondary">No hay habitaciones para mostrar.</div>
-    }
+
+          <div class="bloque-contenido">
+            <header class="encabezado-tarjeta">
+              <div class="tipo-header-flex">
+                <h2>{{ h.tipo }}</h2>
+                <span class="capacidad-etiqueta">
+                  <i class="ti ti-users"></i> Capacidad: {{ h.capacidad }} pers.
+                </span>
+              </div>
+              <div class="linea-oro-corta"></div>
+            </header>
+
+            <p class="descripcion-habitacion">
+              Disfruta de nuestra exclusiva habitación {{ h.tipo }}, diseñada con los más altos estándares de comodidad y lujo para una estadía inolvidable.
+            </p>
+
+            <div class="bloque-tarifas">
+              <h4>Tarifa Oficial</h4>
+              <div class="tabla-tarifas">
+                <div class="fila-tarifa">
+                  <span class="tiempo"><i class="ti ti-moon"></i> Precio por Noche</span>
+                  <span class="precio">S/ {{ h.precio_por_noche | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-reserva-premium" [disabled]="h.esta_ocupada">
+              <span>{{ h.esta_ocupada ? 'No Disponible' : 'Reservar Ahora' }}</span>
+              <i class="ti ti-arrow-right"></i>
+            </button>
+          </div>
+
+        </article>
+      }
+    </div>
+
   }
 </section>

@@ -84,7 +84,7 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/club/'
 LOGOUT_REDIRECT_URL = '/club/'
 
-# CORS — permite que Angular en :4200 consuma la API de Django en :8765
+# CORS — permite que Angular en :4200 consuma la API de Django en :8000
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
     'http://127.0.0.1:4200',

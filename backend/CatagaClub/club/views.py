@@ -61,6 +61,24 @@ class HabitacionDeleteView(ProtectedCRUDMixin, DeleteView):
     success_url = '/club/habitaciones/'
 
 
+def estado_habitaciones_api(request):
+    habitaciones = Habitacion.objects.all()
+    data = []
+    for h in habitaciones:
+        data.append({
+            'id': h.id,
+            'numero': h.numero,
+            'tipo': h.tipo,
+            'precio_por_noche': float(h.precio_por_noche),
+            'esta_ocupada': h.esta_ocupada,
+            'capacidad': h.capacidad,
+            'imagen_principal': h.imagen_principal if h.imagen_principal else None,
+            'imagen_cama': h.imagen_cama if h.imagen_cama else None,
+            'imagen_bano': h.imagen_bano if h.imagen_bano else None,
+            'imagen_extra': h.imagen_extra if h.imagen_extra else None,
+        })
+    # Recuerda que en tu Angular usas 'resp.habitaciones', por eso la respuesta debe llevar esta clave:
+    return JsonResponse({'habitaciones': data})
 # ── CLIENTES ──────────────────────────────────────────────────────────────────
 
 class ClienteListView(PublicListMixin, ListView):
@@ -182,12 +200,28 @@ def lista_platos_api(request):
 @require_GET
 def api_estado_habitaciones(request):
     data = list(
-        Habitacion.objects.values('id', 'numero', 'tipo', 'precio_por_noche', 'esta_ocupada', 'capacidad')
+        Habitacion.objects.values(
+            'id',
+            'numero',
+            'tipo',
+            'precio_por_noche',
+            'esta_ocupada',
+            'capacidad',
+            'imagen_principal',
+            'imagen_cama',
+            'imagen_bano',
+            'imagen_extra',
+        )
     )
+
     for item in data:
         item['precio_por_noche'] = float(item['precio_por_noche'])
-    return JsonResponse({'ok': True, 'count': len(data), 'habitaciones': data}, safe=False)
 
+    return JsonResponse({
+        'ok': True,
+        'count': len(data),
+        'habitaciones': data
+    })
 
 @require_GET
 def api_reservas(request):

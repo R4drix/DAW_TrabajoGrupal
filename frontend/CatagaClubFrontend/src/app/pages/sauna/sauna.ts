@@ -24,7 +24,7 @@ export class Sauna /*implements OnInit*/ {
         this.loading.set(false);
       },
       error: (err: any) => {
-        this.errorMsg = `No se pudo conectar con el backend (${err.status ?? 'sin status'}). Verifica que Django esté corriendo en :8765.`;
+        this.errorMsg = `No se pudo conectar con el backend (${err.status ?? 'sin status'}). Verifica que Django esté corriendo en :8000.`;
         this.loading.set(false);
       },
     })

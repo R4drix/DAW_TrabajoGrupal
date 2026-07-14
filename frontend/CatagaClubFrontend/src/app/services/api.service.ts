@@ -13,8 +13,8 @@ import { Consumo, Dashboard, Habitacion, Reserva } from './models';
 export class ApiService {
   private readonly http = inject(HttpClient);
 
-  // En desarrollo: Django corre en :8765 y Angular en :4200
-  private readonly baseUrl = 'http://localhost:8765/club/api';
+  // En desarrollo: Django corre en :8000 y Angular en :4200
+  private readonly baseUrl = 'http://localhost:8000/club/api';
 
   getEstadoHabitaciones(): Observable<{ ok: boolean; count: number; habitaciones: Habitacion[] }> {
     return this.http.get<{ ok: boolean; count: number; habitaciones: Habitacion[] }>(`${this.baseUrl}/estado/`);

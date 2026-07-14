@@ -1,268 +1,370 @@
-/* ==========================
-   ESTILOS GENERALES Y SCROLL
-========================== */
+/* ==========================================================================
+   ESTILOS GENERALES DE LA SECCIÓN (FULL-WIDTH CORREGIDO)
+   ========================================================================== */
 .seccion-habitaciones {
-  background-color: var(--black);
-  padding: 120px 40px;
-  min-height: 100vh;
+  width: 100%;             
+  max-width: 100%;         
+  margin: 0;
+  padding: 60px 4%; /* Uso de porcentaje para adaptabilidad fluida en los laterales */
+  font-family: 'Montserrat', sans-serif;
+  background-color: #0a0a0a; 
+  color: #f5f5f5;
+  box-sizing: border-box;  
 }
 
 .encabezado-pagina {
   text-align: center;
-  max-width: 600px;
-  margin: 0 auto 80px;
+  margin-bottom: 60px;
 }
 
 .etiqueta-oro {
-  font-size: 0.7rem;
-  letter-spacing: 5px;
-  color: var(--gold);
+  color: #d4af37; /* Dorado de Cátaga */
+  font-size: 0.85rem;
   text-transform: uppercase;
-  margin-bottom: 16px;
+  letter-spacing: 5px; 
+  margin-bottom: 12px;
+  font-weight: 600;
 }
 
 .titulo-pagina {
   font-family: 'Playfair Display', serif;
   font-size: 2.8rem;
-  color: var(--white);
-  margin-bottom: 16px;
-}
-
-.subtitulo-pagina {
-  color: #777777;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-/* ==========================
-   GALERÍA DESTACADA (3 fotos lado a lado)
-========================== */
-.galeria-destacada {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1100px;
-  margin: 0 auto 80px;
-}
-
-.foto-destacada {
-  position: relative;
-  height: 280px;
-  overflow: hidden;
-  border: 1px solid rgba(201, 168, 76, 0.15);
-}
-
-.foto-destacada img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.foto-destacada:hover img {
-  transform: scale(1.06);
-}
-
-.foto-destacada-info {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-}
-
-.foto-destacada-tipo {
-  color: var(--gold);
-  font-size: 0.7rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
   font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
 }
 
-.foto-destacada-numero {
-  color: var(--white);
-  font-size: 0.85rem;
-}
-
-@media (max-width: 768px) {
-  .galeria-destacada {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ==========================
-   CONTENEDOR DEL CATÁLOGO
-========================== */
+/* ==========================================================================
+   CONTENEDOR DE TARJETAS (ESTRUCTURA PREMIUM)
+   ========================================================================== */
 .lista-habitaciones {
   display: flex;
   flex-direction: column;
-  gap: 100px; /* Espacio generoso entre habitación y habitación */
-  max-width: 1100px;
-  margin: 0 auto;
+  gap: 48px;
+  width: 100%;
 }
 
-/* LA TARJETA DE FILA INTERCALADA */
 .tarjeta-habitacion {
   display: grid;
-  grid-template-columns: 1.1fr 1fr; /* Foto un toque más ancha */
-  gap: 60px;
-  align-items: center;
-  background: #0d0d0d;
-  border: 1px solid rgba(201, 168, 76, 0.05);
-  padding: 24px;
+  grid-template-columns: 1fr;
+  background: linear-gradient(145deg, #141414, #1c1c1c); 
+  border-radius: 20px; 
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+  width: 100%;
 }
 
-/* Invierte el orden automáticamente para las tarjetas pares (efecto zigzag elegante) */
-.tarjeta-habitacion:nth-child(even) {
-  direction: rtl;
-}
-.tarjeta-habitacion:nth-child(even) .bloque-contenido {
-  direction: ltr; /* Devuelve el texto a su lectura normal */
+/* En pantallas grandes (Desktop), la tarjeta se divide a la mitad de forma proporcional */
+@media (min-width: 992px) {
+  .tarjeta-habitacion {
+    grid-template-columns: 1.1fr 1fr; /* Mantiene un balance perfecto sin estirar de más las fotos */
+  }
 }
 
-/* ==========================
-   BLOQUE IZQUIERDO: IMAGEN
-========================== */
-.bloque-imagen {
+.tarjeta-habitacion:hover {
+  transform: translateY(-8px);
+  border-color: rgba(212, 175, 55, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.03);
+}
+
+/* ==========================================================================
+   ESTRUCTURA DE LA GALERÍA MULTI-IMAGEN (ADAPTABILIDAD DE FOTOS)
+   ========================================================================== */
+.bloque-galeria-multi {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .bloque-galeria-multi {
+    display: grid;
+    grid-template-columns: 3.4fr 1fr;
+    gap: 12px;
+    height: 380px; /* Altura fija para que la galería sea simétrica */
+  }
+}
+
+/* --- Imagen Principal --- */
+.bloque-imagen-principal {
   position: relative;
   width: 100%;
-  height: 420px;
+  height: 260px; /* Altura en móviles */
   overflow: hidden;
-  border: 1px solid rgba(201, 168, 76, 0.15);
+  border-radius: 14px;
+  background-color: #121212; 
 }
 
-.bloque-imagen img {
+@media (min-width: 768px) {
+  .bloque-imagen-principal {
+    height: 100%; 
+  }
+}
+
+.bloque-imagen-principal .img-main {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease;
+  object-position: center; 
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.tarjeta-habitacion:hover .bloque-imagen img {
+.tarjeta-habitacion:hover .img-main {
   transform: scale(1.04);
 }
 
 .numero-fondo {
   position: absolute;
-  top: -20px;
-  right: 10px;
-  font-family: 'Playfair Display', serif;
-  font-size: 7rem;
+  bottom: 16px;
+  left: 20px;
+  font-size: 2.6rem;
   font-weight: 700;
-  color: rgba(201, 168, 76, 0.05);
-  z-index: 1;
-  user-select: none;
+  color: #ffffff;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
 }
 
-/* ==========================
-   BLOQUE DERECHO: TEXTOS Y TARIFAS
-========================== */
-.bloque-contenido {
+.badge-estado {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  border-radius: 50px;
+  color: #ffffff;
+  background: rgba(46, 204, 113, 0.2); 
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.badge-estado.ocupada {
+  background: rgba(231, 76, 60, 0.2); 
+  border: 1px solid rgba(231, 76, 60, 0.4);
+}
+
+/* --- Miniaturas --- */
+.bloque-miniaturas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
   width: 100%;
 }
 
-.encabezado-tarjeta h2 {
+@media (min-width: 768px) {
+  .bloque-miniaturas {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    height: 100%;
+    gap: 10px;
+  }
+}
+
+.miniatura-item {
+  position: relative;
+  width: 100%;
+  height: 80px; 
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: #121212;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .miniatura-item {
+    height: 100%; /* Altura perfectamente calculada a partir del contenedor */
+  }
+}
+
+.miniatura-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Garantiza que las miniaturas no se estiren */
+  object-position: center;
+  filter: brightness(0.7); 
+  transition: all 0.5s ease;
+}
+
+.miniatura-item:hover {
+  border-color: #d4af37;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.miniatura-item:hover img {
+  transform: scale(1.08);
+  filter: brightness(1.0);
+}
+
+.etiqueta-foto {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 6px 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 30%, transparent);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.55rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.miniatura-item:hover .etiqueta-foto {
+  color: #d4af37;
+}
+
+/* ==========================================================================
+   BLOQUE DE DETALLES Y RESERVA
+   ========================================================================== */
+.bloque-contenido {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 35px;
+  box-sizing: border-box;
+}
+
+.tipo-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tipo-header-flex h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 2.2rem;
-  color: var(--white);
-  margin-bottom: 12px;
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+.capacidad-etiqueta {
+  font-size: 0.85rem;
+  color: #8a8a8a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.capacidad-etiqueta i {
+  color: #d4af37;
+  font-size: 0.95rem;
 }
 
 .linea-oro-corta {
   width: 40px;
-  height: 1px;
-  background: var(--gold);
-  margin-bottom: 24px;
+  height: 2px;
+  background-color: #d4af37;
+  margin-top: 12px;
+  border-radius: 2px;
 }
 
 .descripcion-habitacion {
-  font-size: 0.95rem;
-  color: #aaaaaa;
+  font-size: 0.92rem;
+  color: #b8b8b8;
   line-height: 1.7;
-  margin-bottom: 30px;
+  margin: 24px 0;
 }
 
-/* Tarifario */
+/* --- Tarifas --- */
+.bloque-tarifas {
+  margin-bottom: 28px;
+}
+
 .bloque-tarifas h4 {
   font-size: 0.75rem;
-  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--white);
-  margin-bottom: 12px;
+  color: #aa841c; 
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .tabla-tarifas {
-  border-top: 1px solid rgba(201, 168, 76, 0.15);
-  margin-bottom: 30px;
+  background-color: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 14px 18px;
 }
 
 .fila-tarifa {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-}
-  color: #888888;
-}
-
-.fila-tarifa .tiempo i {
-  color: var(--gold);
-  margin-right: 6px;
-}
-
-.fila-tarifa .precio {
-  font-size: 0.95rem;
-  color: var(--white);
-  font-weight: 600;
-}
-
-/* Botón Premium */
-.btn-reserva-premium {
-  width: 100%;
-  background: transparent;
-  border: 1px solid var(--gold);
-  color: var(--white);
-  padding: 16px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: 0.3s;
-}
-
-.btn-reserva-premium:hover {
-  background: var(--gold);
-  color: var(--black);
-}
-
-/* ==========================
-   RESPONSIVE / ADAPTABILIDAD
-========================== */
-@media (max-width: 992px) {
-  .tarjeta-habitacion, .tarjeta-habitacion:nth-child(even) {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    direction: ltr;
-    padding: 15px;
-  }
-
-  .bloque-imagen {
-    height: 300px;
-  }
-
-  .seccion-habitaciones {
-    padding: 80px 20px;
-  }
 }
 
 .fila-tarifa .tiempo {
   font-size: 0.9rem;
+  color: #9c9c9c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fila-tarifa .tiempo i {
+  color: #d4af37;
+  font-size: 1.05rem;
+}
+
+.fila-tarifa .precio {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Playfair Display', serif; 
+}
+
+/* --- Botón Premium --- */
+.btn-reserva-premium {
+  width: 100%;
+  background: linear-gradient(135deg, #d4af37 0%, #b38f1d 100%);
+  color: #0d0d0d;
+  border: none;
+  border-radius: 10px;
+  padding: 16px 24px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-reserva-premium:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e5c158 0%, #cfa62b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+}
+
+.btn-reserva-premium:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-reserva-premium:disabled {
+  background: #222222;
+  color: #555555;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  cursor: not-allowed;
+  box-shadow: none;
+}

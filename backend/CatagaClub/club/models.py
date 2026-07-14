@@ -17,6 +17,9 @@ class Cliente(models.Model):
         return self.nombre
 
 
+from django.db import models
+from django.core.exceptions import ValidationError
+
 class Habitacion(models.Model):
     TIPO_CHOICES = [
         ('Individual', 'Individual'),
@@ -31,6 +34,12 @@ class Habitacion(models.Model):
     esta_ocupada = models.BooleanField(default=False)
     capacidad = models.PositiveIntegerField(default=2)
 
+    # --- NUEVOS CAMPOS PARA LAS 4 VISTAS ---
+    imagen_principal = models.CharField(max_length=500, blank=True, null=True, help_text="Vista general de la habitación")
+    imagen_cama = models.CharField(max_length=500, blank=True, null=True, help_text="Foto detallada de la cama")
+    imagen_bano = models.CharField(max_length=500, blank=True, null=True, help_text="Foto del cuarto de baño")
+    imagen_extra = models.CharField(max_length=500, blank=True, null=True, help_text="Detalles adicionales (jacuzzi, sauna o decoración)")
+
     class Meta:
         ordering = ['numero']
 
@@ -42,7 +51,6 @@ class Habitacion(models.Model):
             raise ValidationError({'precio_por_noche': 'El precio debe ser mayor a 0.'})
         if self.numero is not None and self.numero <= 0:
             raise ValidationError({'numero': 'El número de habitación debe ser positivo.'})
-
 
 class Reserva(models.Model):
     ESTADO_CHOICES = [
