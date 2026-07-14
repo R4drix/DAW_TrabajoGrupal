@@ -5,7 +5,7 @@
   width: 100%;             
   max-width: 100%;         
   margin: 0;
-  padding: 60px 4%; /* Uso de porcentaje para adaptabilidad fluida en los laterales */
+  padding: 60px 4%;
   font-family: 'Montserrat', sans-serif;
   background-color: #0a0a0a; 
   color: #f5f5f5;
@@ -18,7 +18,7 @@
 }
 
 .etiqueta-oro {
-  color: #d4af37; /* Dorado de Cátaga */
+  color: #d4af37;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 5px; 
@@ -35,7 +35,7 @@
 }
 
 /* ==========================================================================
-   CONTENEDOR DE TARJETAS (ESTRUCTURA PREMIUM)
+   CONTENEDOR DE TARJETAS 
    ========================================================================== */
 .lista-habitaciones {
   display: flex;
@@ -56,7 +56,6 @@
   width: 100%;
 }
 
-/* En pantallas grandes (Desktop), la tarjeta se divide a la mitad de forma proporcional */
 @media (min-width: 992px) {
   .tarjeta-habitacion {
     grid-template-columns: 1.1fr 1fr; /* Mantiene un balance perfecto sin estirar de más las fotos */
@@ -86,7 +85,7 @@
     display: grid;
     grid-template-columns: 3.4fr 1fr;
     gap: 12px;
-    height: 380px; /* Altura fija para que la galería sea simétrica */
+    height: 380px; 
   }
 }
 
