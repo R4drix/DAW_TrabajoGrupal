@@ -33,6 +33,206 @@
           <button type="button" class="numero-circulo numero-mas">+</button>
         </div>
         <p class="wizard-nota">* Bebés y niños deben ser incluidos en la cantidad de personas.</p>
+      } @else if (pasoActual() === 1) {
+        <h2 class="wizard-titulo">Seleccione sus fechas</h2>
+        <div class="wizard-divisor"></div>
+
+        <div class="calendarios">
+          <div class="calendario">
+            <div class="calendario-header">
+              <button type="button" class="calendario-flecha" (click)="mesAnterior()" aria-label="Mes anterior">‹</button>
+              <span class="calendario-mes">{{ etiquetaMes(mesIzquierdo()) }}</span>
+              <span class="calendario-flecha calendario-flecha--vacia"></span>
+            </div>
+            <div class="calendario-dias-semana">
+              @for (d of diasSemana; track d) {
+                <span>{{ d }}</span>
+              }
+            </div>
+            <div class="calendario-grilla">
+              @for (dia of diasMesIzquierdo(); track $index) {
+                <button
+                  type="button"
+                  class="calendario-dia"
+                  [class.vacio]="!dia"
+                  [class.deshabilitado]="dia?.deshabilitado"
+                  [class.llegada]="esLlegada(dia)"
+                  [class.salida]="esSalida(dia)"
+                  [class.en-rango]="esEnRango(dia)"
+                  [disabled]="!dia || dia.deshabilitado"
+                  (click)="seleccionarFecha(dia)"
+                >
+                  {{ dia?.numero }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="calendario">
+            <div class="calendario-header">
+              <span class="calendario-flecha calendario-flecha--vacia"></span>
+              <span class="calendario-mes">{{ etiquetaMes(mesDerecho()) }}</span>
+              <button type="button" class="calendario-flecha" (click)="mesSiguiente()" aria-label="Mes siguiente">›</button>
+            </div>
+            <div class="calendario-dias-semana">
+              @for (d of diasSemana; track d) {
+                <span>{{ d }}</span>
+              }
+            </div>
+            <div class="calendario-grilla">
+              @for (dia of diasMesDerecho(); track $index) {
+                <button
+                  type="button"
+                  class="calendario-dia"
+                  [class.vacio]="!dia"
+                  [class.deshabilitado]="dia?.deshabilitado"
+                  [class.llegada]="esLlegada(dia)"
+                  [class.salida]="esSalida(dia)"
+                  [class.en-rango]="esEnRango(dia)"
+                  [disabled]="!dia || dia.deshabilitado"
+                  (click)="seleccionarFecha(dia)"
+                >
+                  {{ dia?.numero }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="fechas-elegidas">
+          <div class="fecha-chip" [class.completo]="fechaLlegada()">
+            <span class="fecha-chip-label">Llegada</span>
+            <span class="fecha-chip-valor">{{ formatearFecha(fechaLlegada()) }}</span>
+          </div>
+          <div class="fecha-chip" [class.completo]="fechaSalida()">
+            <span class="fecha-chip-label">Salida</span>
+            <span class="fecha-chip-valor">{{ formatearFecha(fechaSalida()) }}</span>
+          </div>
+        </div>
+      } @else if (pasoActual() === 2) {
+        <h2 class="wizard-titulo">Seleccione el tipo de habitación</h2>
+        <div class="wizard-divisor"></div>
+
+        <div class="tipo-habitacion-grid">
+          @for (tipo of tiposHabitacion; track tipo) {
+            <button
+              type="button"
+              class="tipo-habitacion-btn"
+              [class.activo]="tipoSeleccionado() === tipo"
+              (click)="seleccionarTipo(tipo)"
+            >
+              {{ tipo }}
+            </button>
+          }
+        </div>
+
+        @if (tipoSeleccionado()) {
+          <div class="habitaciones-divisor"></div>
+          <p class="wizard-nota habitaciones-leyenda">
+            <span class="leyenda-punto disponible"></span> Disponible
+            <span class="leyenda-punto ocupada"></span> Ocupada
+          </p>
+
+          <div class="habitaciones-grid">
+            @for (hab of habitacionesDelTipo(); track hab.numero) {
+              <button
+                type="button"
+                class="habitacion-card"
+                [class.ocupada]="!hab.disponible"
+                [class.activo]="habitacionSeleccionada()?.numero === hab.numero"
+                [disabled]="!hab.disponible"
+                (click)="seleccionarHabitacion(hab)"
+              >
+                <img [src]="hab.imagen_principal" [alt]="'Habitación ' + hab.numero" class="habitacion-imagen" />
+                <div class="habitacion-info">
+                  <span class="habitacion-numero">Hab. {{ hab.numero }}</span>
+                  <span class="habitacion-capacidad">{{ hab.capacidad }} pers.</span>
+                </div>
+                <span class="habitacion-precio">S/ {{ hab.precio_por_noche }} / noche</span>
+              </button>
+            }
+          </div>
+        }
+      } @else if (pasoActual() === 3) {
+        @if (!reservaConfirmada()) {
+          <h2 class="wizard-titulo">Revise su reserva</h2>
+          <div class="wizard-divisor"></div>
+
+          <div class="resumen-lista">
+            <div class="resumen-item">
+              <span class="resumen-label">Personas</span>
+              <span class="resumen-valor">{{ personas() }}</span>
+            </div>
+            <div class="resumen-item">
+              <span class="resumen-label">Llegada</span>
+              <span class="resumen-valor">{{ formatearFecha(fechaLlegada()) }}</span>
+            </div>
+            <div class="resumen-item">
+              <span class="resumen-label">Salida</span>
+              <span class="resumen-valor">{{ formatearFecha(fechaSalida()) }}</span>
+            </div>
+            <div class="resumen-item">
+              <span class="resumen-label">Noches</span>
+              <span class="resumen-valor">{{ noches() }}</span>
+            </div>
+            <div class="resumen-item">
+              <span class="resumen-label">Habitación</span>
+              <span class="resumen-valor">{{ habitacionSeleccionada()?.tipo }} — Hab. {{ habitacionSeleccionada()?.numero }}</span>
+            </div>
+            <div class="resumen-item resumen-total">
+              <span class="resumen-label">Total</span>
+              <span class="resumen-valor">S/ {{ total() }}</span>
+            </div>
+          </div>
+
+          <div class="wizard-divisor"></div>
+
+          <div class="datos-form">
+            <label class="datos-label">
+              Nombre completo
+              <input
+                type="text"
+                class="datos-input"
+                [value]="nombreCliente()"
+                (input)="actualizarNombre($event)"
+                placeholder="Ej. María Pérez"
+              />
+            </label>
+            <label class="datos-label">
+              Correo electrónico
+              <input
+                type="email"
+                class="datos-input"
+                [value]="correoCliente()"
+                (input)="actualizarCorreo($event)"
+                placeholder="correo@ejemplo.com"
+              />
+            </label>
+            <label class="datos-label">
+              Teléfono
+              <input
+                type="tel"
+                class="datos-input"
+                [value]="telefonoCliente()"
+                (input)="actualizarTelefono($event)"
+                placeholder="+51 900 000 000"
+              />
+            </label>
+          </div>
+        } @else {
+          <h2 class="wizard-titulo">¡Reserva confirmada!</h2>
+          <div class="wizard-divisor"></div>
+          <p class="wizard-nota">
+            Código de reserva: <span class="codigo-reserva">{{ codigoReserva() }}</span><br />
+            Hemos registrado tu reserva a nombre de {{ nombreCliente() }}. Puedes descargar el comprobante en PDF.
+          </p>
+          <button type="button" class="btn-wizard-siguiente btn-descargar-factura" (click)="generarFacturaPDF()">
+            Descargar factura (PDF)
+          </button>
+          <button type="button" class="btn-wizard-atras btn-nueva-reserva" (click)="nuevaReserva()">
+            Hacer otra reserva
+          </button>
+        }
       } @else {
         <h2 class="wizard-titulo">{{ pasos[pasoActual()].label }}</h2>
         <div class="wizard-divisor"></div>
@@ -40,17 +240,30 @@
       }
 
       <div class="wizard-nav">
-        @if (pasoActual() > 0) {
-          <button type="button" class="btn-wizard-atras" (click)="irAtras()">← Volver</button>
+        @if (!(esUltimoPaso() && reservaConfirmada())) {
+          @if (pasoActual() > 0) {
+            <button type="button" class="btn-wizard-atras" (click)="irAtras()">← Volver</button>
+          }
+          @if (!esUltimoPaso()) {
+            <button
+              type="button"
+              class="btn-wizard-siguiente"
+              [disabled]="!pasoCompleto()"
+              (click)="irSiguiente()"
+            >
+              Siguiente →
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn-wizard-siguiente"
+              [disabled]="!pasoCompleto()"
+              (click)="confirmarReserva()"
+            >
+              Reservar
+            </button>
+          }
         }
-        <button
-          type="button"
-          class="btn-wizard-siguiente"
-          [disabled]="pasoActual() === 0 && personas() === null"
-          (click)="irSiguiente()"
-        >
-          Siguiente →
-        </button>
       </div>
     </div>
   </div>

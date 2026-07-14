@@ -14,7 +14,10 @@ export class Habitaciones implements OnInit {
   private readonly api = inject(ApiService);
 
   // Placeholder de respaldo por si alguna habitación aún no tiene foto subida.
-  private readonly imagenPorDefecto = 'habitaciones/placeholder.jpg';
+  private readonly imagenPorDefecto = '/habitaciones/placeholder.jpg';
+
+  // Números de habitación cuya foto ya falló al cargar (para no reintentar en bucle).
+  private readonly fotosFallidas = new Set<number>();
 
   habitaciones: Habitacion[] = [];
   loading = signal(true);
@@ -41,13 +44,21 @@ export class Habitaciones implements OnInit {
 
   /** Foto única por número de habitación (101.jpg, 201.jpg, etc. en public/habitaciones/). */
   public imagenDe(h: Habitacion): string {
-    return `habitaciones/${h.numero}.jpg`;
+    if (this.fotosFallidas.has(h.numero)) {
+      return this.imagenPorDefecto;
+    }
+    return `/habitaciones/${h.numero}.jpg`;
   }
 
-  /** Si la foto de esa habitación no existe todavía, cae al placeholder en vez de romper el layout. */
-  public onImgError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = this.imagenPorDefecto;
+  /**
+   * Si la foto de esa habitación no existe todavía, marca el número como fallido para que
+   * `imagenDe` devuelva el placeholder de forma estable. No tocamos el DOM directamente aquí:
+   * si lo hiciéramos, el binding [src]="imagenDe(h)" lo pisaría en el siguiente ciclo de
+   * detección de cambios (volviendo a la ruta rota) y quedaría en un parpadeo infinito.
+   */
+  public onImgError(h: Habitacion): void {
+    if (this.fotosFallidas.has(h.numero)) return; // ya está en el placeholder, no seguir reintentando
+    this.fotosFallidas.add(h.numero);
   }
 
   public select(h: Habitacion): void {

@@ -225,3 +225,396 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* ---- Paso Fecha: calendarios ---- */
+.calendarios {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.calendario {
+  flex: 1;
+  min-width: 240px;
+}
+
+.calendario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.calendario-mes {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+
+.calendario-flecha {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: transparent;
+  color: var(--white);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.calendario-flecha:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.calendario-flecha--vacia {
+  visibility: hidden;
+  border: none;
+  cursor: default;
+}
+
+.calendario-dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+
+.calendario-dias-semana span {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #777777;
+  letter-spacing: 0.5px;
+}
+
+.calendario-grilla {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendario-dia {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--white);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.calendario-dia.vacio {
+  visibility: hidden;
+  cursor: default;
+}
+
+.calendario-dia.deshabilitado {
+  color: #444444;
+  cursor: not-allowed;
+}
+
+.calendario-dia:hover:not(.deshabilitado):not(.vacio) {
+  border-color: var(--gold);
+}
+
+.calendario-dia.en-rango {
+  background: rgba(212, 175, 55, 0.15);
+  border-radius: 4px;
+}
+
+.calendario-dia.llegada,
+.calendario-dia.salida {
+  background: var(--gold);
+  color: var(--black);
+  font-weight: 700;
+  border-color: var(--gold);
+}
+
+.fechas-elegidas {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.fecha-chip {
+  flex: 1;
+  min-width: 160px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fecha-chip-label {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.fecha-chip-valor {
+  font-size: 0.95rem;
+  color: #999999;
+  text-transform: capitalize;
+}
+
+.fecha-chip.completo .fecha-chip-valor {
+  color: var(--gold);
+}
+
+@media (max-width: 768px) {
+  .calendarios {
+    gap: 20px;
+  }
+}
+
+/* ---- Paso Habitación: tipo ---- */
+.tipo-habitacion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.tipo-habitacion-btn {
+  padding: 16px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--white);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tipo-habitacion-btn:hover {
+  border-color: var(--gold);
+}
+
+.tipo-habitacion-btn.activo {
+  border-color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 700;
+}
+
+.habitaciones-divisor {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 28px 0 16px;
+}
+
+.habitaciones-leyenda {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+.leyenda-punto {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 12px;
+}
+
+.leyenda-punto:first-child {
+  margin-left: 0;
+}
+
+.leyenda-punto.disponible {
+  background: var(--gold);
+}
+
+.leyenda-punto.ocupada {
+  background: #555555;
+}
+
+/* ---- Paso Habitación: habitaciones individuales ---- */
+.habitaciones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.habitacion-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  overflow: hidden;
+  transition: 0.2s;
+  text-align: left;
+}
+
+.habitacion-imagen {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+
+.habitacion-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px 0;
+  font-size: 0.82rem;
+}
+
+.habitacion-numero {
+  font-weight: 700;
+}
+
+.habitacion-capacidad {
+  font-size: 0.75rem;
+  color: #999999;
+}
+
+.habitacion-precio {
+  padding: 2px 10px 10px;
+  font-size: 0.78rem;
+  color: var(--gold);
+}
+
+.habitacion-card:hover:not(.ocupada) {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.habitacion-card.activo {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+.habitacion-card.activo .habitacion-precio {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.habitacion-card.ocupada {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.habitacion-card.ocupada .habitacion-imagen {
+  filter: grayscale(1);
+}
+
+.habitacion-card.ocupada .habitacion-numero {
+  text-decoration: line-through;
+  color: #999999;
+}
+
+.habitacion-card.ocupada .habitacion-precio {
+  color: #777777;
+}
+
+@media (max-width: 768px) {
+  .tipo-habitacion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Paso Tus datos: resumen ---- */
+.resumen-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resumen-item {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+}
+
+.resumen-label {
+  color: #999999;
+}
+
+.resumen-valor {
+  color: var(--white);
+  text-transform: capitalize;
+  text-align: right;
+}
+
+.resumen-total {
+  border-bottom: none;
+  padding-top: 4px;
+}
+
+.resumen-total .resumen-label,
+.resumen-total .resumen-valor {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: none;
+}
+
+/* ---- Paso Tus datos: formulario ---- */
+.datos-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.datos-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.datos-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  font-size: 0.95rem;
+  padding: 8px 2px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.datos-input:focus {
+  border-color: var(--gold);
+}
+
+.datos-input::placeholder {
+  color: #555555;
+}
+
+/* ---- Paso Tus datos: confirmación ---- */
+.codigo-reserva {
+  color: var(--gold);
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.btn-descargar-factura,
+.btn-nueva-reserva {
+  width: 100%;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.btn-nueva-reserva {
+  margin-left: 0;
+}

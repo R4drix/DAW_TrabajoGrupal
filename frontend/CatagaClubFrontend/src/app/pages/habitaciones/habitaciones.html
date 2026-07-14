@@ -18,7 +18,7 @@
               [src]="imagenDe(h)"
               [alt]="'Habitación ' + h.numero + ' - ' + h.tipo"
               loading="lazy"
-              (error)="onImgError($event)"
+              (error)="onImgError(h)"
             />
             <div class="foto-destacada-info">
               <span class="foto-destacada-tipo">{{ h.tipo }}</span>
