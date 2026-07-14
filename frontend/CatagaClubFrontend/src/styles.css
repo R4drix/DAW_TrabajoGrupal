@@ -1,5 +1,3 @@
-/* src/styles.css */
-
 :root{
     --gold: #D4AF37;
     --black: #111111;
@@ -29,6 +27,8 @@ ul{
     list-style: none;
 }
 
+/*Estilos de clases globales*/
+
 .container{
     width: 90%;
     max-width: 1200px;
@@ -43,14 +43,98 @@ ul{
     cursor: pointer;
 }
 
+.card{
+    background: var(--white);
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
 .section-title{
     color: var(--gold);
     text-align: center;
     margin-bottom: 20px;
 }
+/*Estilos globales mas detallados*/
+.section-hero{
+    background-color: #000000;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    position: relative;
+}
+.section-hero h1{
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    color: #ffffff !important;
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+    font-family: 'Playfair Display', serif;
+}
+.section-hero h3 {
+    font-size: 0.8rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: #c9a84c !important;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+}
+.section-hero p {
+    font-size: 1rem;
+    color: #aaaaaa !important;
+    line-height: 1.8;
+    max-width: 420px;
+    margin: 0 auto 44px;
+}
 
-.card{
-    background: var(--white);
-    border: 1px solid #ddd;
-    padding: 20px;
+
+.hero-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    color: #c9a84c !important;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after{
+    content: "";
+    width: 30px;
+    height: 1px;
+    background: #c9a84c;
+}
+
+.btn-hero {
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--black);
+    background: var(--gold);
+    padding: 16px 40px;
+    transition: 0.3s;
+}
+.btn-hero:hover {
+    background: #e0be6a;
+    letter-spacing: 4px;
+    cursor: pointer;
+}
+
+.content{
+    background-color: #111111 !important;
+    padding: 100px 40px;
+}
+.content h1{
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: #ffffff !important;
+    text-align: center;
+    margin-bottom: 60px;
 }

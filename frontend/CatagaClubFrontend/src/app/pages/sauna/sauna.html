@@ -1,5 +1,5 @@
-<section class="hero-sauna">
-  <div class="hero-content">
+<section class="section-hero">
+  <div>
     <div class="hero-eyebrow">Bienestar & Relajación</div>
     <h1>NUESTRO SAUNA</h1>
     <h3>Un oasis de renovación</h3>
@@ -7,23 +7,21 @@
       Desconéctate del mundo exterior y sumérgete en una experiencia 
       diseñada para purificar el cuerpo y calmar la mente.
     </p>
-    <a routerLink="" class="btn-hero">
+    <button class="btn-hero">
       Reservar Sesión
-    </a>
+    </button>
   </div>
 </section>
 
-<section class="servicios">
-
-  <div class="section-header">
-    <div class="section-label">El circuito</div>
-    <h2 class="section-title">Espacios de Bienestar</h2>
-  </div>
+<section class="content">
+  <div class="hero-eyebrow">Camaras disponibles</div>
+  <h1>Espacios de Bienestar</h1>
   @if (!loading()) {
-    <div class="cards">
+    <div class="cards" [style.--camaras-count]="columnas">
       @for (camara of camaras; track camara) {
         <div
           class="card"
+          [class.card-activa]="camaraSeleccionada()?.id === camara.id"
           routerLink="{{camara.id}}"
           (mouseenter)="select(camara)"
           (mouseleave)="deselect()"
@@ -41,13 +39,31 @@
           </div>
       }
     </div>
-    <div class="">
-      @if (camaraSeleccionada() != null) {
-        <div class="card">
-          <!--Info de la camaraSelccionada-->
+    <div class="camara-preview">
+      @if (camaraSeleccionada(); as camara) {
+        <div class="card camara-preview-card">
+          <!--
+            <span class="card-icon">
+              <i class="ti ti-{{camara.icon_class}}" aria-hidden="true"></i>
+            </span>
+            -->
+          <h3>{{camara.tipo}}</h3>
+          <!--
+            <div class="imagen">
+              <img [src]="camara.imagenUrl" alt="Imagen de la camara">
+            </div>
+            Se cargara la imagen de la camara (cuando se guarden)
+          -->
+          <p>(Imagen)</p>
+          <p>{{camara.descripcion}}</p>
+          @if (camara.capacidad) {
+            <span class="camara-capacidad">Capacidad: {{camara.capacidad}} personas</span>
+          }
         </div>
       } @else {
-        <div class="">Selecciona una camara</div>
+        <div style="text-align: center;">
+          Pasa el mouse sobre una cámara para ver más detalles
+        </div>
       }
     </div>
   } @else {
