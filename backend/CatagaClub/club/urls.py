@@ -33,8 +33,8 @@ urlpatterns = [
     # Restaurante
     path('api/club/platos/', views.lista_platos_api, name='lista_platos_api'),
     # API JSON
-    path('api/estado/',                        views.api_estado_habitaciones,        name='api_estado'),
-    path('api/reservas/',                      views.api_reservas,                   name='api_reservas'),
+    path('api/estado/', views.estado_habitaciones_api, name='api_estado'),
+    path('api/reservas/', views.api_reservas, name='api_reservas'),
     path('api/consumos/',                      views.api_consumos,                   name='api_consumos'),
     path('api/dashboard/',                     views.api_dashboard,                  name='api_dashboard'),
 
