@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Signal, inject, signal } from '@angular/core';
-
 import { ApiService } from '../../services/api.service';
 import { Habitacion } from '../../services/models';
 
@@ -13,6 +12,9 @@ import { Habitacion } from '../../services/models';
 })
 export class Habitaciones implements OnInit {
   private readonly api = inject(ApiService);
+
+  // Placeholder de respaldo por si alguna habitación aún no tiene foto subida.
+  private readonly imagenPorDefecto = 'habitaciones/placeholder.jpg';
 
   habitaciones: Habitacion[] = [];
   loading = signal(true);
@@ -31,6 +33,23 @@ export class Habitaciones implements OnInit {
       },
     });
   }
+
+  /** Todas las habitaciones, para la galería de la parte superior (vitrina, no reserva). */
+  public get destacadas(): Habitacion[] {
+    return this.habitaciones;
+  }
+
+  /** Foto única por número de habitación (101.jpg, 201.jpg, etc. en public/habitaciones/). */
+  public imagenDe(h: Habitacion): string {
+    return `habitaciones/${h.numero}.jpg`;
+  }
+
+  /** Si la foto de esa habitación no existe todavía, cae al placeholder en vez de romper el layout. */
+  public onImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = this.imagenPorDefecto;
+  }
+
   public select(h: Habitacion): void {
     this.habitacionSeleccionada.set(h);
   }
