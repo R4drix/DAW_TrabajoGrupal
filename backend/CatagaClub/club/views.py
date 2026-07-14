@@ -291,3 +291,49 @@ def home(request):
         'reservas_activas':    Reserva.objects.filter(estado='activa').count(),
     }
     return render(request, 'club/home.html', ctx)
+from datetime import datetime
+from django.db.models import Q
+from django.http import JsonResponse
+from .models import Habitacion, Reserva
+
+def habitaciones_disponibles_api(request):
+    try:
+        llegada_str = request.GET.get('llegada')
+        salida_str = request.GET.get('salida')
+
+        # 1. Traemos ABSOLUTAMENTE TODAS las habitaciones de tu base de datos
+        # Sin filtros de capacidad para que todas las pestañas (Simple, Doble, etc.) tengan datos
+        habitaciones = Habitacion.objects.all()
+
+        # 2. Identificar cuáles están reservadas en estas fechas
+        ocupadas_ids = set()
+        if llegada_str and salida_str:
+            try:
+                llegada_date = datetime.strptime(llegada_str, "%Y-%m-%d").date()
+                salida_date = datetime.strptime(salida_str, "%Y-%m-%d").date()
+
+                ocupadas_ids = set(Reserva.objects.filter(
+                    estado='activa'
+                ).filter(
+                    Q(fecha_checkin__lt=salida_date) & Q(fecha_checkout__gt=llegada_date)
+                ).values_list('habitacion_id', flat=True))
+            except ValueError:
+                pass
+
+        # 3. Construimos el JSON enviando todo
+        data = []
+        for h in habitaciones:
+            data.append({
+                'id': h.id,
+                'numero': h.numero,
+                'tipo': h.tipo,
+                'precio_por_noche': float(h.precio_por_noche),
+                'capacidad': h.capacidad,
+                'imagen_principal': h.imagen_principal if h.imagen_principal else "https://via.placeholder.com/300",
+                'esta_ocupada': h.id in ocupadas_ids 
+            })
+
+        return JsonResponse(data, safe=False)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

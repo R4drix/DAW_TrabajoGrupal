@@ -1,27 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { jsPDF } from 'jspdf';
+import { ApiService } from '../../services/api.service'; // Ajusta la ruta de tu servicio
+import { Habitacion } from '../../services/models'; // 
 
-interface PasoWizard {
-  label: string;
-}
-
-interface DiaCalendario {
-  fecha: Date;
-  numero: number;
-  deshabilitado: boolean;
-}
+interface PasoWizard { label: string; }
+interface DiaCalendario { fecha: Date; numero: number; deshabilitado: boolean; }
 
 type TipoHabitacion = 'Simple' | 'Doble' | 'Familiar' | 'Suite';
 
-interface Habitacion {
-  numero: string;
-  tipo: TipoHabitacion;
-  disponible: boolean;
-  precio_por_noche: number;
-  capacidad: number;
-  imagen_principal: string;
-}
+
 
 @Component({
   selector: 'app-reservar-wizard',
@@ -31,6 +19,8 @@ interface Habitacion {
   styleUrls: ['./reservar.css'],
 })
 export class ReservarWizard {
+  private apiService = inject(ApiService); // Inyección del servicio
+
   readonly pasos: PasoWizard[] = [
     { label: 'Personas' },
     { label: 'Fecha' },
@@ -44,7 +34,6 @@ export class ReservarWizard {
 
   // --- Paso Fecha ---
   readonly diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-
   mesIzquierdo = signal<Date>(this.primerDiaDe(new Date()));
   fechaLlegada = signal<Date | null>(null);
   fechaSalida = signal<Date | null>(null);
@@ -53,32 +42,18 @@ export class ReservarWizard {
   diasMesIzquierdo = computed(() => this.diasDelMes(this.mesIzquierdo()));
   diasMesDerecho = computed(() => this.diasDelMes(this.mesDerecho()));
 
-  // --- Paso Habitación ---
+  // --- Paso Habitación (Dinamizado) ---
   readonly tiposHabitacion: TipoHabitacion[] = ['Simple', 'Doble', 'Familiar', 'Suite'];
-
-  // TODO: reemplazar por la disponibilidad y datos reales que vengan del backend (Django) según las fechas elegidas
-  readonly habitaciones: Habitacion[] = [
-    { numero: '101', tipo: 'Simple', disponible: true, precio_por_noche: 120, capacidad: 2, imagen_principal: '/habitaciones/101.jpg' },
-    { numero: '102', tipo: 'Simple', disponible: false, precio_por_noche: 120, capacidad: 2, imagen_principal: '/habitaciones/102.jpg' },
-    { numero: '201', tipo: 'Doble', disponible: true, precio_por_noche: 180, capacidad: 3, imagen_principal: '/habitaciones/201.jpg' },
-    { numero: '202', tipo: 'Doble', disponible: false, precio_por_noche: 180, capacidad: 3, imagen_principal: '/habitaciones/202.jpg' },
-    { numero: '203', tipo: 'Doble', disponible: true, precio_por_noche: 180, capacidad: 3, imagen_principal: '/habitaciones/203.jpg' },
-    { numero: '301', tipo: 'Familiar', disponible: true, precio_por_noche: 250, capacidad: 5, imagen_principal: '/habitaciones/301.jpg' },
-    { numero: '302', tipo: 'Familiar', disponible: false, precio_por_noche: 250, capacidad: 5, imagen_principal: '/habitaciones/302.jpg' },
-    { numero: '401', tipo: 'Suite', disponible: true, precio_por_noche: 320, capacidad: 2, imagen_principal: '/habitaciones/401.jpg' },
-    { numero: '402', tipo: 'Suite', disponible: false, precio_por_noche: 320, capacidad: 2, imagen_principal: '/habitaciones/402.jpg' },
-    { numero: '403', tipo: 'Suite', disponible: true, precio_por_noche: 320, capacidad: 2, imagen_principal: '/habitaciones/403.jpg' },
-  ];
-
-
-
+  
+  // Ahora las habitaciones son una señal que empieza vacía
+  habitaciones = signal<Habitacion[]>([]);
   tipoSeleccionado = signal<TipoHabitacion | null>(null);
   habitacionSeleccionada = signal<Habitacion | null>(null);
 
-  habitacionesDelTipo = computed(() =>
-    this.habitaciones.filter((h) => h.tipo === this.tipoSeleccionado())
-  );
-
+  habitacionesDelTipo = computed(() => {
+    const seleccionado = this.tipoSeleccionado()?.toLowerCase();
+    return this.habitaciones().filter((h) => h.tipo?.toLowerCase() === seleccionado);
+  });
   // --- Paso Tus datos ---
   nombreCliente = signal('');
   correoCliente = signal('');
@@ -108,6 +83,7 @@ export class ReservarWizard {
       this.telefonoCliente().trim().length > 0
   );
 
+  // --- Métodos de Control ---
   elegirPersonas(n: number): void {
     this.mostrarInputPersonas.set(false);
     this.personas.set(n);
@@ -145,31 +121,53 @@ export class ReservarWizard {
     const fecha = dia.fecha;
     const llegada = this.fechaLlegada();
 
-    // Sin llegada, o ya había un rango completo: empieza una selección nueva
     if (!llegada || (llegada && this.fechaSalida())) {
       this.fechaLlegada.set(fecha);
       this.fechaSalida.set(null);
       return;
     }
 
-    // Ya hay llegada, falta la salida
     if (fecha.getTime() > llegada.getTime()) {
       this.fechaSalida.set(fecha);
     } else if (fecha.getTime() < llegada.getTime()) {
       this.fechaLlegada.set(fecha);
       this.fechaSalida.set(null);
     }
-    // Mismo día que la llegada: no se permite una estancia de 0 noches, no hace nada
   }
 
-  esLlegada(dia: DiaCalendario | null): boolean {
-    return !!dia && this.esMismoDia(dia.fecha, this.fechaLlegada());
+  // --- Carga dinámica desde la base de datos ---
+  cargarHabitacionesDisponibles(): void {
+    const llegada = this.fechaLlegada()?.toISOString().split('T')[0];
+    const salida = this.fechaSalida()?.toISOString().split('T')[0];
+    const cantPersonas = this.personas();
+
+    if (llegada && salida && cantPersonas) {
+      this.apiService.getHabitacionesDisponibles({
+        personas: cantPersonas,
+        llegada: llegada,
+        salida: salida
+      }).subscribe({
+        next: (data) => this.habitaciones.set(data),
+        error: (err) => console.error('Error cargando habitaciones de Supabase:', err)
+      });
+    }
   }
 
-  esSalida(dia: DiaCalendario | null): boolean {
-    return !!dia && this.esMismoDia(dia.fecha, this.fechaSalida());
+  irSiguiente(): void {
+    if (!this.pasoCompleto()) return;
+    
+    // Si pasa del paso 1 (fechas) al paso 2 (habitaciones), dispara la consulta a Supabase
+    if (this.pasoActual() === 1) {
+      this.cargarHabitacionesDisponibles();
+    }
+
+    if (this.pasoActual() < this.pasos.length - 1) {
+      this.pasoActual.update((p) => p + 1);
+    }
   }
 
+  esLlegada(dia: DiaCalendario | null): boolean { return !!dia && this.esMismoDia(dia.fecha, this.fechaLlegada()); }
+  esSalida(dia: DiaCalendario | null): boolean { return !!dia && this.esMismoDia(dia.fecha, this.fechaSalida()); }
   esEnRango(dia: DiaCalendario | null): boolean {
     const llegada = this.fechaLlegada();
     const salida = this.fechaSalida();
@@ -188,26 +186,35 @@ export class ReservarWizard {
   }
 
   seleccionarHabitacion(habitacion: Habitacion): void {
-    if (!habitacion.disponible) return;
     this.habitacionSeleccionada.set(habitacion);
   }
 
-  actualizarNombre(event: Event): void {
-    this.nombreCliente.set((event.target as HTMLInputElement).value);
-  }
-
-  actualizarCorreo(event: Event): void {
-    this.correoCliente.set((event.target as HTMLInputElement).value);
-  }
-
-  actualizarTelefono(event: Event): void {
-    this.telefonoCliente.set((event.target as HTMLInputElement).value);
-  }
+  actualizarNombre(event: Event): void { this.nombreCliente.set((event.target as HTMLInputElement).value); }
+  actualizarCorreo(event: Event): void { this.correoCliente.set((event.target as HTMLInputElement).value); }
+  actualizarTelefono(event: Event): void { this.telefonoCliente.set((event.target as HTMLInputElement).value); }
 
   confirmarReserva(): void {
-    if (!this.datosCompletos()) return;
-    this.codigoReserva.set(this.generarCodigoReserva());
-    this.reservaConfirmada.set(true);
+    if (!this.datosCompletos() || !this.habitacionSeleccionada()) return;
+
+    const payloadReserva = {
+      habitacion_numero: this.habitacionSeleccionada()?.numero,
+      fecha_llegada: this.fechaLlegada()?.toISOString().split('T')[0],
+      fecha_salida: this.fechaSalida()?.toISOString().split('T')[0],
+      nombre_cliente: this.nombreCliente(),
+      correo_cliente: this.correoCliente(),
+      telefono_cliente: this.telefonoCliente(),
+      total_pago: this.total(),
+      cantidad_personas: this.personas()
+    };
+
+    this.apiService.crearReserva(payloadReserva).subscribe({
+      next: (response) => {
+        // Asumiendo que Django genera el código y lo devuelve
+        this.codigoReserva.set(response.codigo_reserva || this.generarCodigoReserva());
+        this.reservaConfirmada.set(true);
+      },
+      error: (err) => console.error('Error al guardar la reserva:', err)
+    });
   }
 
   nuevaReserva(): void {
@@ -223,23 +230,20 @@ export class ReservarWizard {
     this.telefonoCliente.set('');
     this.reservaConfirmada.set(false);
     this.codigoReserva.set('');
+    this.habitaciones.set([]);
   }
 
   generarFacturaPDF(): void {
     const habitacion = this.habitacionSeleccionada();
     if (!habitacion) return;
-
     const doc = new jsPDF();
-
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     doc.text('Cátaga Club', 20, 20);
-
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
     doc.text('Comprobante de Reserva', 20, 28);
     doc.line(20, 33, 190, 33);
-
     let y = 44;
     const fila = (etiqueta: string, valor: string) => {
       doc.setFont('helvetica', 'bold');
@@ -248,7 +252,6 @@ export class ReservarWizard {
       doc.text(valor, 85, y);
       y += 8;
     };
-
     fila('Código de reserva:', this.codigoReserva());
     fila('Fecha de emisión:', new Date().toLocaleDateString('es-PE'));
     y += 3;
@@ -262,16 +265,13 @@ export class ReservarWizard {
     fila('Noches:', String(this.noches()));
     fila('Habitación:', `${habitacion.tipo} — N.º ${habitacion.numero}`);
     fila('Precio por noche:', `S/ ${habitacion.precio_por_noche}`);
-
     y += 2;
     doc.line(20, y, 190, y);
     y += 10;
-
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.text('Total a pagar:', 20, y);
     doc.text(`S/ ${this.total()}`, 85, y);
-
     doc.save(`factura-${this.codigoReserva()}.pdf`);
   }
 
@@ -280,14 +280,8 @@ export class ReservarWizard {
     return `CTG-${aleatorio}`;
   }
 
-  private primerDiaDe(fecha: Date): Date {
-    return new Date(fecha.getFullYear(), fecha.getMonth(), 1);
-  }
-
-  private sumarMeses(fecha: Date, cantidad: number): Date {
-    return new Date(fecha.getFullYear(), fecha.getMonth() + cantidad, 1);
-  }
-
+  private primerDiaDe(fecha: Date): Date { return new Date(fecha.getFullYear(), fecha.getMonth(), 1); }
+  private sumarMeses(fecha: Date, cantidad: number): Date { return new Date(fecha.getFullYear(), fecha.getMonth() + cantidad, 1); }
   private esMismoDia(a: Date | null, b: Date | null): boolean {
     if (!a || !b) return false;
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -298,17 +292,11 @@ export class ReservarWizard {
     const mesIndice = mes.getMonth();
     const primerDia = new Date(anio, mesIndice, 1);
     const totalDias = new Date(anio, mesIndice + 1, 0).getDate();
-
-    // getDay(): 0=Domingo..6=Sábado. Se ajusta para que Lunes sea la primera columna.
     const desplazamiento = (primerDia.getDay() + 6) % 7;
-
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-
     const celdas: (DiaCalendario | null)[] = [];
-    for (let i = 0; i < desplazamiento; i++) {
-      celdas.push(null);
-    }
+    for (let i = 0; i < desplazamiento; i++) { celdas.push(null); }
     for (let d = 1; d <= totalDias; d++) {
       const fecha = new Date(anio, mesIndice, d);
       celdas.push({ fecha, numero: d, deshabilitado: fecha.getTime() < hoy.getTime() });
@@ -316,32 +304,17 @@ export class ReservarWizard {
     return celdas;
   }
 
-  /** Condición de completitud por paso. Se va llenando a medida que construimos cada paso. */
   pasoCompleto(): boolean {
     switch (this.pasoActual()) {
-      case 0:
-        return this.personas() !== null && this.personas()! > 0;
-      case 1:
-        return this.fechaLlegada() !== null && this.fechaSalida() !== null;
-      case 2:
-        return this.habitacionSeleccionada() !== null;
-      case 3:
-        return this.datosCompletos();
-      default:
-        return true;
-    }
-  }
-
-  irSiguiente(): void {
-    if (!this.pasoCompleto()) return;
-    if (this.pasoActual() < this.pasos.length - 1) {
-      this.pasoActual.update((p) => p + 1);
+      case 0: return this.personas() !== null && this.personas()! > 0;
+      case 1: return this.fechaLlegada() !== null && this.fechaSalida() !== null;
+      case 2: return this.habitacionSeleccionada() !== null;
+      case 3: return this.datosCompletos();
+      default: return true;
     }
   }
 
   irAtras(): void {
-    if (this.pasoActual() > 0) {
-      this.pasoActual.update((p) => p - 1);
-    }
+    if (this.pasoActual() > 0) { this.pasoActual.update((p) => p - 1); }
   }
 }

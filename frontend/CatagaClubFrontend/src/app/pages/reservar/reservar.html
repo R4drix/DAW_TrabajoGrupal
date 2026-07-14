@@ -59,7 +59,7 @@
                   [class.llegada]="esLlegada(dia)"
                   [class.salida]="esSalida(dia)"
                   [class.en-rango]="esEnRango(dia)"
-                  [disabled]="!dia || dia.deshabilitado"
+                  
                   (click)="seleccionarFecha(dia)"
                 >
                   {{ dia?.numero }}
@@ -89,7 +89,7 @@
                   [class.llegada]="esLlegada(dia)"
                   [class.salida]="esSalida(dia)"
                   [class.en-rango]="esEnRango(dia)"
-                  [disabled]="!dia || dia.deshabilitado"
+                  
                   (click)="seleccionarFecha(dia)"
                 >
                   {{ dia?.numero }}
@@ -138,9 +138,9 @@
               <button
                 type="button"
                 class="habitacion-card"
-                [class.ocupada]="!hab.disponible"
                 [class.activo]="habitacionSeleccionada()?.numero === hab.numero"
-                [disabled]="!hab.disponible"
+                [class.ocupada]="hab.esta_ocupada"
+                [disabled]="hab.esta_ocupada"
                 (click)="seleccionarHabitacion(hab)"
               >
                 <img [src]="hab.imagen_principal" [alt]="'Habitación ' + hab.numero" class="habitacion-imagen" />

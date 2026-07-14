@@ -37,4 +37,6 @@ urlpatterns = [
     path('api/reservas/',                      views.api_reservas,                   name='api_reservas'),
     path('api/consumos/',                      views.api_consumos,                   name='api_consumos'),
     path('api/dashboard/',                     views.api_dashboard,                  name='api_dashboard'),
-]
+
+    #reserva
+path('api/habitaciones/disponibles/', views.habitaciones_disponibles_api, name='habitaciones_disponibles_api'),]
