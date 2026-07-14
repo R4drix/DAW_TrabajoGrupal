@@ -29,11 +29,8 @@ urlpatterns = [
     path('reservas/<int:pk>/borrar/',          views.ReservaDeleteView.as_view(),    name='reserva_borrar'),
     path('reservas/<int:pk>/cuenta/',          views.reserva_cuenta_pdf,             name='reserva_cuenta'),
 
-    # Consumos
-    path('consumos/',                          views.ConsumoListView.as_view(),      name='consumo_lista'),
-    path('consumos/nuevo/',                    views.ConsumoCreateView.as_view(),    name='consumo_crear'),
-    path('consumos/<int:pk>/borrar/',          views.ConsumoDeleteView.as_view(),    name='consumo_borrar'),
-
+    # Restaurante
+    path('api/club/platos/', views.lista_platos_api, name='lista_platos_api'),
     # API JSON
     path('api/estado/',                        views.api_estado_habitaciones,        name='api_estado'),
     path('api/reservas/',                      views.api_reservas,                   name='api_reservas'),

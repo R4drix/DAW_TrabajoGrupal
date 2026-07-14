@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Cliente, ConsumoRestaurante, Habitacion, Reserva
+from .models import Cliente, Habitacion, Reserva, Plato
 
 
 @admin.register(Cliente)
@@ -22,9 +22,3 @@ class ReservaAdmin(admin.ModelAdmin):
     list_filter = ('estado',)
     search_fields = ('cliente__nombre',)
 
-
-@admin.register(ConsumoRestaurante)
-class ConsumoRestauranteAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'descripcion_plato', 'precio', 'cantidad', 'fecha')
-    list_filter = ('fecha',)
-    search_fields = ('cliente__nombre', 'descripcion_plato')

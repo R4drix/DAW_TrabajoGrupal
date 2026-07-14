@@ -1,62 +1,55 @@
 <section class="section-hero">
     <div>
-        <div class="hero-eyebrow">Cocina Nikkei de autor</div>
-    <h1>RESTAURANTE</h1>
-    <h3>Una experiencia gastronómica inolvidable</h3>
-    <p>
-        Fusión de sabores peruanos en un ambiente elegante, pensado para disfrutar cada detalle.
-    </p>
+        <div class="hero-eyebrow">Cocina de autor</div>
+        <h1>CATÁLOGO DEL CLUB</h1>
+        <h3>Una experiencia gastronómica inolvidable</h3>
+        <p>
+            Fusión de sabores únicos en un ambiente elegante, pensado para disfrutar cada detalle de nuestro menú.
+        </p>
     </div>
 </section>
 
-<section class="reserva" id="reserva">
+<section class="carta-seccion" id="carta">
+    <div class="hero-eyebrow">Nuestra Carta</div>
+    <h1>Explora la carta</h1>
 
-    <div class="hero-eyebrow">Reservas</div>
-    <h1>Reserva tu mesa</h1>
-
-    <form class="form-reserva" [formGroup]="reservaForm" (ngSubmit)="buscarMesas()">
-        <div class="form-field">
-            <label for="fecha">Fecha</label>
-            <input id="fecha" type="date" formControlName="fecha">
-        </div>
-
-        <div class="form-field">
-            <label for="hora">Hora</label>
-            <input id="hora" type="time" formControlName="hora">
-        </div>
-
-        <div class="form-field">
-            <label for="personas">Personas</label>
-            <input id="personas" type="number" min="1" max="20" formControlName="personas">
-        </div>
-
-        <button class="btn-hero" type="submit" [disabled]="cargando()">
-            @if (cargando()) { Consultando... } @else { Consultar disponibilidad }
-        </button>
-    </form>
+    <div class="categorias-filter">
+        <button [class.active]="categoriaSeleccionada() === 'todos'" (click)="filtrarPorCategoria('todos')">Todos</button>
+        <button [class.active]="categoriaSeleccionada() === 'extras'" (click)="filtrarPorCategoria('extras')">Platos / Extras</button>
+        <button [class.active]="categoriaSeleccionada() === 'sandwiches'" (click)="filtrarPorCategoria('sandwiches')">Sándwiches</button>
+        <button [class.active]="categoriaSeleccionada() === 'salchipapas'" (click)="filtrarPorCategoria('salchipapas')">Salchipapas</button>
+        <button [class.active]="categoriaSeleccionada() === 'jugos'" (click)="filtrarPorCategoria('jugos')">Jugos</button>
+        <button [class.active]="categoriaSeleccionada() === 'bebidas'" (click)="filtrarPorCategoria('bebidas')">Bebidas</button>
+        <button [class.active]="categoriaSeleccionada() === 'cocteles'" (click)="filtrarPorCategoria('cocteles')">Cócteles</button>
+    </div>
 
     @if (cargando()) {
-        <h3>Consultando las mesas disponibles...</h3>
+        <h3 class="carta-mensaje">Consultando nuestra carta de platos...</h3>
     }
     @else if (error()) {
-        <h3 class="reserva-mensaje reserva-error">{{ error() }}</h3>
+        <h3 class="carta-mensaje carta-error">{{ error() }}</h3>
     }
-    @else if (mesas() === null) {
-        <h3 class="reserva-mensaje">Elige fecha, hora y número de personas para consultar las mesas disponibles.</h3>
-    }
-    @else if (mesas()!.length === 0) {
-        <h3 class="reserva-mensaje">No hay mesas disponibles para lo que buscas. Prueba con otra fecha u horario.</h3>
+    @else if (platosFiltrados.length === 0) {
+        <h3 class="carta-mensaje">No se encontraron platos disponibles en esta categoría en este momento.</h3>
     }
     @else {
-        <div class="mesas-grid">
-            @for (mesa of mesas(); track mesa.numero) {
-                <div class="card">
-                    <span class="mesa-numero">Mesa {{ mesa.numero }}</span>
-                    <span class="mesa-capacidad">Capacidad para {{ mesa.capacidad }} personas</span>
-                    @if (mesa.ubicacion) {
-                        <span class="mesa-ubicacion">{{ mesa.ubicacion }}</span>
-                    }
-                    <button class="btn-hero" type="button" (click)="seleccionarMesa(mesa)">Reservar esta mesa</button>
+        <div class="platos-grid">
+            @for (plato of platosFiltrados; track plato.id) {
+                <div class="plato-card">
+                    <div class="plato-imagen-container">
+                        <img [src]="plato.imagen_url ? plato.imagen_url : 'assets/images/plato-default.png'" 
+                             alt="{{ plato.nombre }}" 
+                             class="plato-imagen">
+                             loading="lazy"
+                        <span class="plato-categoria-tag">{{ plato.categoria }}</span>
+                    </div>
+                    <div class="plato-info">
+                        <h3 class="plato-nombre">{{ plato.nombre }}</h3>
+                        <p class="plato-descripcion">{{ plato.descripcion }}</p>
+                        <div class="plato-footer">
+                            <span class="plato-precio">S/. {{ plato.precio }}</span>
+                        </div>
+                    </div>
                 </div>
             }
         </div>
