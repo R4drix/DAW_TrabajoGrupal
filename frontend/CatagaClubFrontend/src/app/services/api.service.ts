@@ -1,61 +1,34 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { from, Observable } from 'rxjs'; // Necesario para transformar las promesas de Supabase a Observables
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+import { Consumo, Dashboard, Habitacion, Reserva } from './models';
+
+/**
+ * Servicio único de acceso a la API del backend Django.
+ * Centraliza la URL base y los endpoints para que cualquier componente
+ * pueda consumirlos sin repetir configuración.
+ */
+@Injectable({ providedIn: 'root' })
 export class ApiService {
-  private supabase: SupabaseClient;
+  private readonly http = inject(HttpClient);
 
-  constructor() {
-    const supabaseUrl = 'https://ugiwznnjhbxihazmdmlw.supabase.co';
-    const supabaseKey = 'sb_publishable_reQKQudn5ASJgH6LHb1t_Q_LD1RVoX8';
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+  // En desarrollo: Django corre en :8765 y Angular en :4200
+  private readonly baseUrl = 'http://localhost:8765/club/api';
+
+  getEstadoHabitaciones(): Observable<{ ok: boolean; count: number; habitaciones: Habitacion[] }> {
+    return this.http.get<{ ok: boolean; count: number; habitaciones: Habitacion[] }>(`${this.baseUrl}/estado/`);
   }
 
-  // Método de Autenticación Personalizada que usa el Login
-  async loginAdministrador(usuario: string, contrasena: string) {
-    const { data, error } = await this.supabase
-      .from('usuarios_admin')
-      .select('*')
-      .eq('usuario', usuario)
-      .eq('contrasena', contrasena)
-      .single();
-
-    if (error) throw new Error('Usuario o contraseña incorrectos.');
-    return data;
+  getReservas(): Observable<{ ok: boolean; count: number; reservas: Reserva[] }> {
+    return this.http.get<{ ok: boolean; count: number; reservas: Reserva[] }>(`${this.baseUrl}/reservas/`);
   }
 
-
-  getDashboard(): Observable<any> {
-    return from(
-      this.supabase.from('reservas').select('*').order('created_at', { ascending: false })
-    );
+  getConsumos(): Observable<{ ok: boolean; count: number; consumos: Consumo[] }> {
+    return this.http.get<{ ok: boolean; count: number; consumos: Consumo[] }>(`${this.baseUrl}/consumos/`);
   }
 
-  getEstadoHabitaciones(): Observable<any> {
-    return from(
-      this.supabase.from('habitaciones').select('*')
-    );
-  }
-
-  getReservas(): Observable<any> {
-    // Retorna las reservas generales
-    return from(
-      this.supabase.from('reservas').select('*')
-    );
-  }
-
-  getHabitaciones(): Observable<any> {
-    return from(
-      this.supabase.from('habitaciones').select('*').order('numero', { ascending: true })
-    );
-  }
-
-  actualizarHabitacion(id: number, data: any): Observable<any> {
-    return from(
-      this.supabase.from('habitaciones').update(data).eq('id', id).select()
-    );
+  getDashboard(): Observable<Dashboard> {
+    return this.http.get<Dashboard>(`${this.baseUrl}/dashboard/`);
   }
 }
