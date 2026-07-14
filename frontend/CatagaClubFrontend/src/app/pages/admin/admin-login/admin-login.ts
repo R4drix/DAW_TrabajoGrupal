@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgClass } from '@angular/common';
+import { NgIf, NgClass } from '@angular/common'; // <-- Agregamos NgClass aquí
 import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [FormsModule, NgIf, NgClass],
+  imports: [FormsModule, NgIf, NgClass], // <-- Agregamos NgClass a los imports
   templateUrl: './admin-login.html',
   styleUrl: './admin-login.css'
 })
