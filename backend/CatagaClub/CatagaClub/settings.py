@@ -58,10 +58,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres',
+        'USER': 'postgres.nfnpdxxsfsmhewyfeavu',
         'PASSWORD': 'Cataga_Club_123',
-        'HOST': 'db.nfnpdxxsfsmhewyfeavu.supabase.co',
-        'PORT': '5432',
+        'HOST': 'aws-1-us-west-1.pooler.supabase.com',
+        'PORT': '6543',
     }
 }
 
@@ -88,5 +88,6 @@ LOGOUT_REDIRECT_URL = '/club/'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
     'http://127.0.0.1:4200',
+    'https://dawtrabajogrupal-production.up.railway.app',
 ]
 CORS_ALLOW_CREDENTIALS = True
