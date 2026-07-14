@@ -51,6 +51,7 @@ public placeholders = {
    * Si no está definida en la BD de Supabase, cae en el placeholder elegante.
    */
   public imagenDe(h: Habitacion): string {
+<<<<<<< HEAD
     return h.imagen_principal || this.placeholders.principal;
   }
 
@@ -61,6 +62,23 @@ public placeholders = {
   public onImgError(event: Event, tipo: 'principal' | 'cama' | 'bano' | 'extra' = 'principal'): void {
     const img = event.target as HTMLImageElement;
     img.src = this.placeholders[tipo] || this.placeholders.principal;
+=======
+    if (this.fotosFallidas.has(h.numero)) {
+      return this.imagenPorDefecto;
+    }
+    return `/habitaciones/${h.numero}.jpg`;
+  }
+
+  /**
+   * Si la foto de esa habitación no existe todavía, marca el número como fallido para que
+   * `imagenDe` devuelva el placeholder de forma estable. No tocamos el DOM directamente aquí:
+   * si lo hiciéramos, el binding [src]="imagenDe(h)" lo pisaría en el siguiente ciclo de
+   * detección de cambios (volviendo a la ruta rota) y quedaría en un parpadeo infinito.
+   */
+  public onImgError(h: Habitacion): void {
+    if (this.fotosFallidas.has(h.numero)) return; // ya está en el placeholder, no seguir reintentando
+    this.fotosFallidas.add(h.numero);
+>>>>>>> fbbef5239d1f88264ef11a63cd2c322a846b3c7c
   }
 
   public select(h: Habitacion): void {

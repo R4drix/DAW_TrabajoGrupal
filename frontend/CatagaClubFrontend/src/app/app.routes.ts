@@ -7,8 +7,13 @@ import { Nosotros } from './pages/nosotros/nosotros';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { Reservas } from './pages/reservas/reservas';
 import { Restaurante } from './pages/restaurante/restaurante';
+import { ReservarWizard } from './pages/reservar/reservar';
 
 export const routes: Routes = [
+  {
+    path: 'reservar',
+    component: ReservarWizard,
+  },
   {
     path: '',
     component: Home,
