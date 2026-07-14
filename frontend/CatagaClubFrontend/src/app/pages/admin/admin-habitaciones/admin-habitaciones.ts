@@ -14,7 +14,7 @@ import { ApiService } from '../../../services/api.service';
 export class AdminHabitaciones implements OnInit {
   habitaciones: any[] = [];
   
-  // Objeto temporal para los inputs individuales de cada tarjeta
+  
   formCheckIn: { [key: number]: { nombre: string, noches: number } } = {};
 
   constructor(private api: ApiService) {}
@@ -28,7 +28,7 @@ export class AdminHabitaciones implements OnInit {
       next: (resp: any) => {
         this.habitaciones = resp.data || [];
         
-        // Inicializamos los formularios limpios para las tarjetas
+        
         this.habitaciones.forEach(room => {
           if (!this.formCheckIn[room.id]) {
             this.formCheckIn[room.id] = { nombre: '', noches: 1 };
