@@ -1,0 +1,227 @@
+.reservar-wrapper {
+  min-height: 100vh;
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+}
+
+.wizard-topbar {
+  background: #0a0a0a;
+  padding: 24px 60px 0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.wizard-steps {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wizard-step-label {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  color: #666666;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.wizard-step.activo .wizard-step-label {
+  color: var(--gold);
+}
+
+.wizard-step.hecho .wizard-step-label {
+  color: #999999;
+}
+
+.wizard-linea {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 12px auto 0;
+  position: relative;
+}
+
+.wizard-linea::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.wizard-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #444444;
+  position: relative;
+  z-index: 1;
+  transition: background 0.3s;
+}
+
+.wizard-punto.activo {
+  background: var(--gold);
+}
+
+.wizard-fondo {
+  flex: 1;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(212, 175, 55, 0.06), transparent 40%),
+    repeating-linear-gradient(100deg, #1a1512, #1a1512 2px, #120e0c 2px, #120e0c 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.wizard-card {
+  background: rgba(10, 8, 6, 0.82);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  padding: 48px;
+  max-width: 620px;
+  width: 100%;
+}
+
+.wizard-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--white);
+  font-weight: 400;
+}
+
+.wizard-divisor {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 20px 0 32px;
+}
+
+.wizard-numeros {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.numero-circulo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: transparent;
+  color: var(--white);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.numero-circulo:hover {
+  border-color: var(--gold);
+}
+
+.numero-circulo.activo {
+  background: var(--gold);
+  color: var(--black);
+  border-color: var(--gold);
+  font-weight: 700;
+}
+
+.numero-mas {
+  font-size: 1.3rem;
+}
+
+.wizard-nota {
+  margin-top: 28px;
+  font-size: 0.82rem;
+  color: #888888;
+  line-height: 1.6;
+}
+
+.wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-wizard-siguiente {
+  margin-left: auto;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  padding: 12px 28px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-wizard-siguiente:disabled {
+  background: #444444;
+  color: #888888;
+  cursor: not-allowed;
+}
+
+.btn-wizard-siguiente:not(:disabled):hover {
+  background: #e0be6a;
+}
+
+.btn-wizard-atras {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  padding: 12px 24px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-wizard-atras:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.wizard-footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.75rem;
+  color: #555555;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .wizard-topbar {
+    padding: 20px 20px 0;
+  }
+  .wizard-fondo {
+    padding: 24px;
+  }
+  .wizard-card {
+    padding: 28px;
+  }
+  .wizard-step-label {
+    font-size: 0.65rem;
+  }
+}
+.input-personas {
+  width: 70px;
+  height: 48px;
+  border-radius: 24px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--white);
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+}
+
+.input-personas::-webkit-outer-spin-button,
+.input-personas::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

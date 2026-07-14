@@ -1,0 +1,61 @@
+<section class="reservar-wrapper">
+  <div class="wizard-topbar">
+    <div class="wizard-steps">
+      @for (paso of pasos; track paso.label; let i = $index) {
+        <div class="wizard-step" [class.activo]="i === pasoActual()" [class.hecho]="i < pasoActual()">
+          <span class="wizard-step-label">{{ paso.label }}</span>
+        </div>
+      }
+    </div>
+    <div class="wizard-linea">
+      @for (paso of pasos; track paso.label; let i = $index) {
+        <span class="wizard-punto" [class.activo]="i <= pasoActual()"></span>
+      }
+    </div>
+  </div>
+
+  <div class="wizard-fondo">
+    <div class="wizard-card">
+      @if (pasoActual() === 0) {
+        <h2 class="wizard-titulo">Elija la cantidad de personas</h2>
+        <div class="wizard-divisor"></div>
+        <div class="wizard-numeros">
+          @for (n of [1,2,3,4,5,6]; track n) {
+            <button
+              type="button"
+              class="numero-circulo"
+              [class.activo]="personas() === n"
+              (click)="elegirPersonas(n)"
+            >
+              {{ n }}
+            </button>
+          }
+          <button type="button" class="numero-circulo numero-mas">+</button>
+        </div>
+        <p class="wizard-nota">* Bebés y niños deben ser incluidos en la cantidad de personas.</p>
+      } @else {
+        <h2 class="wizard-titulo">{{ pasos[pasoActual()].label }}</h2>
+        <div class="wizard-divisor"></div>
+        <p class="wizard-nota">Este paso se implementa en el siguiente avance.</p>
+      }
+
+      <div class="wizard-nav">
+        @if (pasoActual() > 0) {
+          <button type="button" class="btn-wizard-atras" (click)="irAtras()">← Volver</button>
+        }
+        <button
+          type="button"
+          class="btn-wizard-siguiente"
+          [disabled]="pasoActual() === 0 && personas() === null"
+          (click)="irSiguiente()"
+        >
+          Siguiente →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wizard-footer">
+    <span>Cátaga Club</span>
+  </div>
+</section>
