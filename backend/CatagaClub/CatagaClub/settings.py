@@ -85,9 +85,5 @@ LOGIN_REDIRECT_URL = '/club/'
 LOGOUT_REDIRECT_URL = '/club/'
 
 # CORS — permite que Angular en :4200 consuma la API de Django en :8765
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:4200',
-    'http://127.0.0.1:4200',
-    'https://dawtrabajogrupal-production.up.railway.app',
-]
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
