@@ -3,6 +3,8 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
 
+from club import views
+
 
 def root_redirect(request):
     return redirect('club:habitacion_lista')
@@ -18,4 +20,7 @@ urlpatterns = [
 
     # App principal
     path('club/', include(('club.urls', 'club'), namespace='club')),
+
+    # restaurant
+    path('api/platos/', views.lista_platos_api, name='lista_platos_api'),
 ]

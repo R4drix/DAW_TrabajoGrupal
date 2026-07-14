@@ -12,9 +12,9 @@ from django.views.decorators.http import require_GET
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                    TemplateView, UpdateView)
 
-from .forms import (ClienteForm, ConsumoRestauranteForm, HabitacionForm,
+from .forms import (ClienteForm, HabitacionForm,
                     ReservaForm)
-from .models import Cliente, ConsumoRestaurante, Habitacion, Reserva
+from .models import Cliente, Habitacion, Reserva, Plato
 
 
 class PublicListMixin:
@@ -166,27 +166,17 @@ class ReservaWizardView(LoginRequiredMixin, TemplateView):
             return self.get(request, *args, **kwargs)
 
 
-# ── CONSUMOS ──────────────────────────────────────────────────────────────────
+# ── RESTAURANTE ──────────────────────────────────────────────────────────────────
 
-class ConsumoListView(ProtectedCRUDMixin, ListView):
-    model = ConsumoRestaurante
-    template_name = 'club/consumo_lista.html'
-    context_object_name = 'consumos'
-
-
-class ConsumoCreateView(ProtectedCRUDMixin, CreateView):
-    model = ConsumoRestaurante
-    form_class = ConsumoRestauranteForm
-    template_name = 'club/form.html'
-    success_url = '/club/consumos/'
-
-
-class ConsumoDeleteView(ProtectedCRUDMixin, DeleteView):
-    model = ConsumoRestaurante
-    template_name = 'club/confirmar_borrado.html'
-    success_url = '/club/consumos/'
-
-
+def lista_platos_api(request):
+    try:
+        # Obtenemos todos los platos de la base de datos de Supabase
+        platos = list(Plato.objects.values('id', 'nombre', 'descripcion', 'precio', 'imagen_url', 'categoria', 'disponible'))
+        return JsonResponse(platos, safe=False)
+    except Exception as e:
+        # Esto nos ayudará a ver el error real en la consola de Django
+        print("ERROR EN API PLATOS:", str(e))
+        return JsonResponse({"error": str(e)}, status=500)
 # ── APIs JSON ─────────────────────────────────────────────────────────────────
 
 @require_GET

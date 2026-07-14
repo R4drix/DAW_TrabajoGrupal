@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from .models import Cliente, ConsumoRestaurante, Habitacion, Reserva
+from .models import Cliente, Habitacion, Reserva
 
 
 class BootstrapMixin:
@@ -95,14 +95,3 @@ class ReservaForm(BootstrapMixin, forms.ModelForm):
 
         return cleaned
 
-
-class ConsumoRestauranteForm(BootstrapMixin, forms.ModelForm):
-    class Meta:
-        model = ConsumoRestaurante
-        fields = ['cliente', 'descripcion_plato', 'precio', 'cantidad']
-
-    def clean_descripcion_plato(self):
-        desc = (self.cleaned_data.get('descripcion_plato') or '').strip()
-        if len(desc) < 2:
-            raise ValidationError('La descripción del plato es demasiado corta.')
-        return desc
