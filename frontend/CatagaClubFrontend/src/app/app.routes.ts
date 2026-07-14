@@ -15,6 +15,7 @@ import { Habitaciones } from './pages/habitaciones/habitaciones';
 import { Sauna } from './pages/sauna/sauna';
 import { Nosotros } from './pages/nosotros/nosotros';
 import { Reservas } from './pages/reservas/reservas';
+import { Restaurante } from './pages/restaurante/restaurante';
 
 // Guardián de seguridad
 import { adminGuard } from './guards/admin-guard';
@@ -37,6 +38,13 @@ export const routes: Routes = [
   { 
     path: 'admin/login', 
     component: AdminLogin 
+  {
+    path: 'restaurante',
+    component: Restaurante,
+  },
+  {
+    path: 'nosotros',
+    component: Nosotros,
   },
 
   // 3. SI ESCRIBEN '/admin' A SECAS, VAN AL LOGIN

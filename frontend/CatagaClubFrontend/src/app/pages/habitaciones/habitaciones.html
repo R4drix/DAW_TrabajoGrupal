@@ -7,53 +7,56 @@
     </p>
   </div>
 
-  <div *ngIf="loading" class="alert alert-info">Cargando habitaciones desde el servidor...</div>
-
-  <div *ngIf="errorMsg" class="alert alert-danger">
-    {{ errorMsg }}
-  </div>
-
-  <div *ngIf="!loading && !errorMsg" class="row">
-    <div class="col-md-4">
-      <div class="list-group">
-        <button
-          *ngFor="let h of habitaciones"
-          type="button"
-          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-          [class.active]="habitacionSeleccionada?.id === h.id"
-          (click)="seleccionarHabitacion(h)"
-        >
-          <span>
-            <strong>Habitación #{{ h.numero }}</strong>
-            <small class="d-block text-muted">{{ h.tipo }}</small>
-          </span>
-          <span *ngIf="h.esta_ocupada" class="badge bg-danger rounded-pill">Ocupada</span>
-          <span *ngIf="!h.esta_ocupada" class="badge bg-success rounded-pill">Libre</span>
-        </button>
+  @if (loading()) {
+    <div class="alert alert-info">Cargando habitaciones desde el servidor...</div>
+    <div class="alert alert-danger">{{errorMsg}}</div>
+  } @else {
+    <div class="row">
+      <div class="col-md-4">
+        <div class="list-group">
+          @for (h of habitaciones; track h) {
+            <div
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+              [class.activa]="habitacionSeleccionada()?.id === h.id"
+              (mouseenter)="select(h)"
+              (mouseleave)="deselect()"
+            >
+              <span>
+                <strong>Habitación #{{ h.numero }}</strong>
+                <small class="d-block text-muted">{{ h.tipo }}</small>
+              </span>
+              @if (h.esta_ocupada) {<span class="badge bg-danger rounded-pill">Ocupada</span>}
+              @else {<span class="badge bg-success rounded-pill">Libre</span>}
+          </div>
+        }
       </div>
     </div>
-
+    
     <div class="col-md-8">
-      <div *ngIf="habitacionSeleccionada; else sinSeleccion" class="card p-4">
-        <h2>Habitación #{{ habitacionSeleccionada.numero }}</h2>
-        <hr />
-        <dl class="row mb-0">
+      @if (habitacionSeleccionada(); as h) {
+        <div class="card p-4">
+          <h2>Habitación #{{ h.numero }}</h2>
+          <hr />
+          <dl class="row mb-0">
           <dt class="col-sm-4">Tipo</dt>
-          <dd class="col-sm-8">{{ habitacionSeleccionada.tipo }}</dd>
+          <dd class="col-sm-8">{{ h.tipo }}</dd>
           <dt class="col-sm-4">Precio por noche</dt>
-          <dd class="col-sm-8">$ {{ habitacionSeleccionada.precio_por_noche }}</dd>
+          <dd class="col-sm-8">$ {{ h.precio_por_noche }}</dd>
           <dt class="col-sm-4">Capacidad</dt>
-          <dd class="col-sm-8">{{ habitacionSeleccionada.capacidad }} persona(s)</dd>
+          <dd class="col-sm-8">{{ h.capacidad }} persona(s)</dd>
           <dt class="col-sm-4">Estado</dt>
           <dd class="col-sm-8">
-            <span *ngIf="habitacionSeleccionada.esta_ocupada" class="badge bg-danger">Ocupada</span>
-            <span *ngIf="!habitacionSeleccionada.esta_ocupada" class="badge bg-success">Disponible</span>
+            @if (h.esta_ocupada) {<span class="badge bg-danger">Ocupada</span>}
+            @else { <span class="badge bg-success">Disponible</span>}
           </dd>
         </dl>
       </div>
-      <ng-template #sinSeleccion>
-        <div class="alert alert-secondary">Selecciona una habitación del listado.</div>
-      </ng-template>
+    } @else {
+      <div class="alert alert-secondary">
+        Selecciona una habitación del listado.
+      </div>
+    }
     </div>
   </div>
+}
 </section>

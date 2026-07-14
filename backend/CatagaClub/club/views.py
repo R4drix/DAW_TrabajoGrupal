@@ -1,15 +1,16 @@
 from decimal import Decimal
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Sum
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.decorators.http import require_GET
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+                                   TemplateView, UpdateView)
 
 from .forms import (ClienteForm, ConsumoRestauranteForm, HabitacionForm,
                     ReservaForm)
@@ -23,6 +24,8 @@ class PublicListMixin:
 class ProtectedCRUDMixin(LoginRequiredMixin):
     """Create/Update/Delete requieren login."""
 
+
+# ── HABITACIONES ──────────────────────────────────────────────────────────────
 
 class HabitacionListView(PublicListMixin, ListView):
     model = Habitacion
@@ -58,6 +61,8 @@ class HabitacionDeleteView(ProtectedCRUDMixin, DeleteView):
     success_url = '/club/habitaciones/'
 
 
+# ── CLIENTES ──────────────────────────────────────────────────────────────────
+
 class ClienteListView(PublicListMixin, ListView):
     model = Cliente
     template_name = 'club/cliente_lista.html'
@@ -83,6 +88,8 @@ class ClienteDeleteView(ProtectedCRUDMixin, DeleteView):
     template_name = 'club/confirmar_borrado.html'
     success_url = '/club/clientes/'
 
+
+# ── RESERVAS ──────────────────────────────────────────────────────────────────
 
 class ReservaListView(ProtectedCRUDMixin, ListView):
     model = Reserva
@@ -116,6 +123,51 @@ class ReservaDeleteView(ProtectedCRUDMixin, DeleteView):
     success_url = '/club/reservas/'
 
 
+# ── WIZARD DE RESERVA (formulario por pasos para el cliente) ──────────────────
+
+class ReservaWizardView(LoginRequiredMixin, TemplateView):
+    """
+    Formulario de reserva en 3 pasos orientado al cliente final.
+    El cliente se asigna automáticamente desde request.user.
+    """
+    template_name = 'club/reserva_wizard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Todas las habitaciones; el template muestra badge libre/ocupada
+        context['habitaciones'] = Habitacion.objects.all().order_by('tipo', 'numero')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        habitacion_id = request.POST.get('habitacion')
+        checkin       = request.POST.get('fecha_checkin')
+        checkout      = request.POST.get('fecha_checkout')
+
+        # Buscar o crear el Cliente vinculado al usuario logueado
+        cliente, _ = Cliente.objects.get_or_create(
+            nombre=request.user.username,
+            defaults={'email': request.user.email or ''}
+        )
+
+        form = ReservaForm(data={
+            'cliente':        cliente.pk,
+            'habitacion':     habitacion_id,
+            'fecha_checkin':  checkin,
+            'fecha_checkout': checkout,
+            'estado':         'activa',
+        })
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Reserva confirmada correctamente!')
+            return redirect('club:reserva_lista')
+        else:
+            messages.error(request, 'Error al guardar la reserva. Revisa los datos.')
+            return self.get(request, *args, **kwargs)
+
+
+# ── CONSUMOS ──────────────────────────────────────────────────────────────────
+
 class ConsumoListView(ProtectedCRUDMixin, ListView):
     model = ConsumoRestaurante
     template_name = 'club/consumo_lista.html'
@@ -135,6 +187,8 @@ class ConsumoDeleteView(ProtectedCRUDMixin, DeleteView):
     success_url = '/club/consumos/'
 
 
+# ── APIs JSON ─────────────────────────────────────────────────────────────────
+
 @require_GET
 def api_estado_habitaciones(request):
     data = list(
@@ -150,13 +204,13 @@ def api_reservas(request):
     data = []
     for r in Reserva.objects.select_related('cliente', 'habitacion').all()[:200]:
         data.append({
-            'id': r.id,
-            'cliente': r.cliente.nombre,
+            'id':         r.id,
+            'cliente':    r.cliente.nombre,
             'habitacion': r.habitacion.numero,
-            'checkin': r.fecha_checkin.isoformat(),
-            'checkout': r.fecha_checkout.isoformat(),
-            'estado': r.estado,
-            'total': float(r.total_acumulado),
+            'checkin':    r.fecha_checkin.isoformat(),
+            'checkout':   r.fecha_checkout.isoformat(),
+            'estado':     r.estado,
+            'total':      float(r.total_acumulado),
         })
     return JsonResponse({'ok': True, 'count': len(data), 'reservas': data}, safe=False)
 
@@ -166,13 +220,13 @@ def api_consumos(request):
     data = []
     for c in ConsumoRestaurante.objects.select_related('cliente').all()[:200]:
         data.append({
-            'id': c.id,
-            'cliente': c.cliente.nombre,
-            'plato': c.descripcion_plato,
-            'precio': float(c.precio),
+            'id':       c.id,
+            'cliente':  c.cliente.nombre,
+            'plato':    c.descripcion_plato,
+            'precio':   float(c.precio),
             'cantidad': c.cantidad,
             'subtotal': float(c.subtotal),
-            'fecha': c.fecha.isoformat(),
+            'fecha':    c.fecha.isoformat(),
         })
     return JsonResponse({'ok': True, 'count': len(data), 'consumos': data}, safe=False)
 
@@ -180,19 +234,20 @@ def api_consumos(request):
 @require_GET
 def api_dashboard(request):
     hoy = timezone.now().date()
-    reservas_activas = Reserva.objects.filter(estado='activa').count()
+    reservas_activas     = Reserva.objects.filter(estado='activa').count()
     habitaciones_ocupadas = Habitacion.objects.filter(esta_ocupada=True).count()
     ingresos_hoy = ConsumoRestaurante.objects.filter(
         fecha__date=hoy
     ).aggregate(total=Sum('precio'))['total'] or Decimal('0.00')
+
     return JsonResponse({
-        'ok': True,
-        'clientes': Cliente.objects.count(),
-        'habitaciones_total': Habitacion.objects.count(),
-        'habitaciones_ocupadas': habitaciones_ocupadas,
-        'reservas_activas': reservas_activas,
+        'ok':                       True,
+        'clientes':                 Cliente.objects.count(),
+        'habitaciones_total':       Habitacion.objects.count(),
+        'habitaciones_ocupadas':    habitaciones_ocupadas,
+        'reservas_activas':         reservas_activas,
         'ingresos_restaurante_hoy': float(ingresos_hoy),
-        'consumos_hoy': ConsumoRestaurante.objects.filter(fecha__date=hoy).count(),
+        'consumos_hoy':             ConsumoRestaurante.objects.filter(fecha__date=hoy).count(),
     }, safe=False)
 
 
@@ -206,9 +261,9 @@ def reserva_cuenta_pdf(request, pk):
 @login_required
 def home(request):
     ctx = {
-        'habitaciones_total': Habitacion.objects.count(),
+        'habitaciones_total':  Habitacion.objects.count(),
         'habitaciones_libres': Habitacion.objects.filter(esta_ocupada=False).count(),
-        'clientes_total': Cliente.objects.count(),
-        'reservas_activas': Reserva.objects.filter(estado='activa').count(),
+        'clientes_total':      Cliente.objects.count(),
+        'reservas_activas':    Reserva.objects.filter(estado='activa').count(),
     }
     return render(request, 'club/home.html', ctx)

@@ -9,6 +9,11 @@ __pycache__/
 # === BASE DE DATOS LOCAL ===
 *.sqlite3
 
+# === ENTORNO / SECRETOS (NO SUBIR) ===
+.env
+.env.local
+.env.*.local
+
 # === ANGULAR Y NODE ===
 **/node_modules/
 .angular/

@@ -30,7 +30,6 @@ export class Sauna /*implements OnInit*/ {
     })
   } Esto se usara cuando se implemente el endpoint de Camaras de sauna
   */
-  
   camaras: Camara[] = [
     {
       id: 1,
@@ -61,6 +60,11 @@ export class Sauna /*implements OnInit*/ {
       icon_class: "user-check",
     },
   ]
+  /** Número de columnas de la grilla: se ajusta a la cantidad de cámaras (máx. 4 por fila) */
+  public get columnas(): number {
+    return this.camaras.length > 0 ? Math.min(this.camaras.length, 4) : 1;
+  }
+
   public select(camara: Camara) {
     this.camaraSeleccionada.set(camara);
   }
