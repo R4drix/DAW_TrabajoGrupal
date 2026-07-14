@@ -1,0 +1,61 @@
+<nav class="admin-sidebar">
+  <!-- Logotipo del Club -->
+  <div class="sidebar-brand">
+    <span class="brand-gold">CÁTAGA</span> CLUB
+    <p class="brand-sub">Conserjería VIP</p>
+  </div>
+
+  <div class="sidebar-menu">
+    <a routerLink="/admin/dashboard" routerLinkActive="active" class="menu-item">
+      <div class="menu-icon-container">
+        <i class="ti ti-diamond"></i>
+      </div>
+      <div class="menu-text">
+        <h4>Reservas VIP</h4>
+        <p>Aceptar y Gestionar</p>
+      </div>
+    </a>
+
+    <a routerLink="/admin/habitaciones" routerLinkActive="active" class="menu-item">
+      <div class="menu-icon-container">
+        <i class="ti ti-bed"></i>
+      </div>
+      <div class="menu-text">
+        <h4>Control de Suites</h4>
+        <p>Disponibilidad y Tiempos</p>
+      </div>
+    </a>
+
+    <a routerLink="/admin/comidas" routerLinkActive="active" class="menu-item">
+      <div class="menu-icon-container">
+        <i class="ti ti-tools-kitchen-2"></i>
+      </div>
+      <div class="menu-text">
+        <h4>Restaurante</h4>
+        <p>Modificar Carta</p>
+      </div>
+    </a>
+  </div>
+
+  <!-- 🔥 EL FOOTER AHORA VIVE AQUÍ ADENTRO -->
+  <div class="sidebar-footer">
+    <div class="status-indicator">
+      <div class="live-dot"></div>
+      <span class="status-text">Conserjería Online</span>
+    </div>
+    <span class="version-label">v2.0</span>
+  </div>
+  
+  <div class="sidebar-menu">
+  <a (click)="verComoUsuario()" class="menu-item user-view-item" style="cursor: pointer;">
+    <div class="menu-icon-container">
+      <i class="ti ti-eye"></i>
+    </div>
+    <div class="menu-text">
+      <h4>Ver como Usuario</h4>
+      <p>Ir a la Vista Pública</p>
+    </div>
+  </a>
+  
+  </div>
+</nav>

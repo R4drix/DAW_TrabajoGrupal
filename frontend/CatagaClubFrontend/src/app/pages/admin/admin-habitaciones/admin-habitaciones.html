@@ -1,0 +1,71 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <div class="header-titles">
+      <h1>Control de Suites & Habitaciones</h1>
+      <p>Supervisión de ocupación, check-ins y tiempos de estadía</p>
+    </div>
+    <div class="status-badge-live">• Modo Conserje</div>
+  </header>
+
+  <div class="suites-grid">
+    <div *ngFor="let room of habitaciones" 
+         class="room-card" 
+         [ngClass]="{'occupied': room.esta_ocupada, 'available': !room.esta_ocupada}">
+      
+      <div class="room-card-header">
+        <span class="room-number">Habitación {{ room.numero }}</span>
+        <span class="room-badge">{{ room.esta_ocupada ? 'OCUPADA' : 'DISPONIBLE' }}</span>
+      </div>
+
+      <div class="room-details">
+        <h3>{{ room.tipo }}</h3>
+        <p class="price"><strong>Tarifa por Noche:</strong> S/ {{ room.precio_por_noche | number:'1.2-2' }}</p>
+        <p><strong>Capacidad Máxima:</strong> {{ room.capacidad }} huéspedes</p>
+      </div>
+
+      <hr class="premium-divider">
+
+      <div *ngIf="room.esta_ocupada" class="status-occupied-info">
+        <div class="info-group">
+          <span class="info-icon">👑</span>
+          <div>
+            <label>Huésped:</label>
+            <p class="guest-name">{{ room.cliente_nombre }}</p>
+          </div>
+        </div>
+        <div class="info-group">
+          <span class="info-icon">🛫</span>
+          <div>
+            <label>Hora de Ingreso:</label>
+            <p>{{ room.hora_ingreso | date:'shortTime' }}</p>
+          </div>
+        </div>
+        <div class="info-group-alert">
+          <span class="info-icon">⏳</span>
+          <div>
+            <label>Fecha de Salida:</label>
+            <p class="checkout-time">{{ room.hora_salida | date:'mediumDate' }} - {{ room.hora_salida | date:'shortTime' }}</p>
+          </div>
+        </div>
+        <button (click)="liberarHabitacion(room.id)" class="btn-action btn-release">
+          Liberar Habitación
+        </button>
+      </div>
+
+      <div *ngIf="!room.esta_ocupada" class="status-available-form">
+        <div class="form-group">
+          <label>Nombre del Huésped</label>
+          <input type="text" [(ngModel)]="formCheckIn[room.id].nombre" placeholder="ej. Alexander Dupon">
+        </div>
+        <div class="form-group">
+          <label>Noches de Reserva</label>
+          <input type="number" [(ngModel)]="formCheckIn[room.id].noches" min="1">
+        </div>
+        <button (click)="registrarCheckIn(room.id)" class="btn-action btn-checkin">
+          Registrar Entrada VIP
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
