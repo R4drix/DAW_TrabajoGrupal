@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { ApiService } from '../../services/api.service';
 import { Reserva } from '../../services/models';
@@ -15,18 +15,18 @@ export class Reservas implements OnInit {
   private readonly api = inject(ApiService);
 
   reservas: Reserva[] = [];
-  loading = true;
+  loading = signal<Boolean>(true);
   errorMsg = '';
 
   ngOnInit(): void {
     this.api.getReservas().subscribe({
       next: (resp) => {
         this.reservas = resp.reservas ?? [];
-        this.loading = false;
+        this.loading.set(false);
       },
       error: (err) => {
         this.errorMsg = `No se pudo cargar las reservas (${err.status ?? 'sin status'}).`;
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }
