@@ -110,6 +110,7 @@ nav {
   border: 1px solid rgba(201, 168, 76, 0.35);
   text-decoration: none;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .user-status:hover {
@@ -136,6 +137,132 @@ nav {
 .user-status.logged-in i {
   color: var(--gold);
   -webkit-text-stroke: 0;
+}
+.dropdown-menu {
+  position: absolute;
+  right: 50px;
+  top: 78px;
+  background-color: #141414;
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  z-index: 1000;
+  animation: dropdown-fade 0.2s ease;
+}
+
+@keyframes dropdown-fade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Cabecera con avatar y datos del usuario */
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 12px;
+}
+
+.user-avatar {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+}
+
+.user-avatar i {
+  font-size: 19px;
+  color: var(--gold);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-name {
+  font-family: 'Playfair Display', serif;
+  color: #f2f2f2;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  color: #999999;
+  font-size: 0.72rem;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ítems de información (no navegables) */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  color: #cccccc;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+  width: 100%;
+  text-align: left;
+  cursor: default;
+  font-family: inherit;
+}
+
+.menu-item i {
+  font-size: 15px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.menu-item strong {
+  color: #f2f2f2;
+  font-weight: 600;
+}
+
+.info-item {
+  cursor: default;
+}
+
+/* Cerrar sesión sí es una acción, por eso lleva estados interactivos */
+.menu-item.logout {
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.menu-item.logout,
+.menu-item.logout i {
+  color: #d98c8c;
+}
+
+.menu-item.logout:hover {
+  background: rgba(217, 140, 140, 0.1);
+}
+
+hr {
+  margin: 4px 8px;
+  border: 0;
+  border-top: 1px solid rgba(201, 168, 76, 0.15);
 }
 
 /* ==========================

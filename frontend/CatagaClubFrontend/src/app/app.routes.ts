@@ -9,6 +9,8 @@ import { Reservas } from './pages/reservas/reservas';
 import { Restaurante } from './pages/restaurante/restaurante';
 import { ReservarWizard } from './pages/reservar/reservar';
 import { Login } from './pages/login/login';
+import { AdminHome } from './pages/admin/admin-home/admin-home';
+import { AdminHabitaciones } from './pages/admin/admin-habitaciones/admin-habitaciones';
 
 export const routes: Routes = [
   {
@@ -52,4 +54,11 @@ export const routes: Routes = [
     path: 'login',
     component: Login,
   },
+  {
+    path: 'admin',
+    children: [
+      {path: '', component: AdminHome},
+      {path: 'habitaciones', component: AdminHabitaciones}
+    ]
+  }
 ];

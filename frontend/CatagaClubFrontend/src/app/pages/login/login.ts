@@ -34,10 +34,11 @@ export class Login {
     this.errorMessage = '';
 
     this.login.login(this.username, this.password).subscribe({
-      next: (res) => {
-        this.login.isLogged = true;
+      next: (res: any) => {
+        this.login.isLogged.set(true);
+        this.login.user = res;
         console.log('Se logueo ....(logica)');
-        
+        this.router.navigate(['/home'])
       },
       error: (err) => {
         console.log('Ocurrio un error', err);
