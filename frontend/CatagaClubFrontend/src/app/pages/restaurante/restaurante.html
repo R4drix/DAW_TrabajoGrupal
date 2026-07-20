@@ -1,0 +1,57 @@
+<section class="section-hero">
+    <div>
+        <div class="hero-eyebrow">Cocina de autor</div>
+        <h1>CATÁLOGO DEL CLUB</h1>
+        <h3>Una experiencia gastronómica inolvidable</h3>
+        <p>
+            Fusión de sabores únicos en un ambiente elegante, pensado para disfrutar cada detalle de nuestro menú.
+        </p>
+    </div>
+</section>
+
+<section class="carta-seccion" id="carta">
+    <div class="hero-eyebrow">Nuestra Carta</div>
+    <h1>Explora la carta</h1>
+
+    <div class="categorias-filter">
+        <button [class.active]="categoriaSeleccionada() === 'todos'" (click)="filtrarPorCategoria('todos')">Todos</button>
+        <button [class.active]="categoriaSeleccionada() === 'extras'" (click)="filtrarPorCategoria('extras')">Platos / Extras</button>
+        <button [class.active]="categoriaSeleccionada() === 'sandwiches'" (click)="filtrarPorCategoria('sandwiches')">Sándwiches</button>
+        <button [class.active]="categoriaSeleccionada() === 'salchipapas'" (click)="filtrarPorCategoria('salchipapas')">Salchipapas</button>
+        <button [class.active]="categoriaSeleccionada() === 'jugos'" (click)="filtrarPorCategoria('jugos')">Jugos</button>
+        <button [class.active]="categoriaSeleccionada() === 'bebidas'" (click)="filtrarPorCategoria('bebidas')">Bebidas</button>
+        <button [class.active]="categoriaSeleccionada() === 'cocteles'" (click)="filtrarPorCategoria('cocteles')">Cócteles</button>
+    </div>
+
+    @if (cargando()) {
+        <h3 class="carta-mensaje">Consultando nuestra carta de platos...</h3>
+    }
+    @else if (error()) {
+        <h3 class="carta-mensaje carta-error">{{ error() }}</h3>
+    }
+    @else if (platosFiltrados.length === 0) {
+        <h3 class="carta-mensaje">No se encontraron platos disponibles en esta categoría en este momento.</h3>
+    }
+    @else {
+        <div class="platos-grid">
+            @for (plato of platosFiltrados; track plato.id) {
+                <div class="plato-card">
+                    <div class="plato-imagen-container">
+                        <img [src]="plato.imagen_url ? plato.imagen_url : 'assets/images/plato-default.png'" 
+                             alt="{{ plato.nombre }}" 
+                             class="plato-imagen">
+                             loading="lazy"
+                        <span class="plato-categoria-tag">{{ plato.categoria }}</span>
+                    </div>
+                    <div class="plato-info">
+                        <h3 class="plato-nombre">{{ plato.nombre }}</h3>
+                        <p class="plato-descripcion">{{ plato.descripcion }}</p>
+                        <div class="plato-footer">
+                            <span class="plato-precio">S/. {{ plato.precio }}</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>

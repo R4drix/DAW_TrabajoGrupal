@@ -25,7 +25,7 @@ proyecto, qué se hizo, cómo se hizo y qué falta.
 
 **Qué cambió:** se instaló `django-cors-headers` y se configuró para
 permitir que el frontend Angular (en `http://localhost:4200`) pueda
-hacer `fetch`/`HttpClient` contra el backend (en `http://localhost:8765`).
+hacer `fetch`/`HttpClient` contra el backend (en `http://localhost:8000`).
 
 **Por qué:** por defecto, los navegadores bloquean peticiones entre
 orígenes distintos (CORS policy). Si Angular pide a Django sin
@@ -64,7 +64,7 @@ Para validar que el preflight funciona:
 curl -X OPTIONS \
   -H "Origin: http://localhost:4200" \
   -H "Access-Control-Request-Method: GET" \
-  -i http://127.0.0.1:8765/club/api/estado/
+  -i http://127.0.0.1:8000/club/api/estado/
 ```
 
 Debe responder con `access-control-allow-origin: http://localhost:4200`.
@@ -94,7 +94,7 @@ import { Consumo, Dashboard, Habitacion, Reserva } from './models';
 @Injectable({ providedIn: 'root' })  // singleton global
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8765/club/api';
+  private readonly baseUrl = 'http://localhost:8000/club/api';
 
   getEstadoHabitaciones() {
     return this.http.get<{ ok: boolean; count: number; habitaciones: Habitacion[] }>(
@@ -305,14 +305,14 @@ DJANGO_SUPERUSER_PASSWORD=admin123 .venv/bin/python manage.py createsuperuser \
   --noinput --username admin --email admin@cataga.local
 
 # Levantar el server
-.venv/bin/python manage.py runserver 0.0.0.0:8765
+.venv/bin/python manage.py runserver 0.0.0.0:8000
 ```
 
 Visitar:
-- `http://localhost:8765/club/` → home del panel (requiere login)
-- `http://localhost:8765/club/habitaciones/` → habitaciones (público)
-- `http://localhost:8765/admin/` → admin Django
-- `http://localhost:8765/accounts/login/` → login
+- `http://localhost:8000/club/` → home del panel (requiere login)
+- `http://localhost:8000/club/habitaciones/` → habitaciones (público)
+- `http://localhost:8000/admin/` → admin Django
+- `http://localhost:8000/accounts/login/` → login
 
 ### 3.2 Frontend
 
@@ -335,7 +335,7 @@ y deberías ver la lista de habitaciones. La pestaña `/dashboard` muestra
 métricas y `/reservas` muestra el listado.
 
 Si ves error de conexión, verificá:
-1. Backend en :8765 → `curl http://localhost:8765/club/api/estado/`
+1. Backend en :8000 → `curl http://localhost:8000/club/api/estado/`
 2. CORS configurado → curl con `-H "Origin: http://localhost:4200"`
 3. Ng serve en :4200 → `curl http://localhost:4200/`
 
@@ -427,6 +427,6 @@ Crear rama `feat/pdf-report` e implementar:
    versión que use `xhtml2pdf` y devuelva `application/pdf`.
 2. Template `reserva_cuenta_pdf.html` optimizado para PDF (CSS inline).
 3. Botón "Descargar cuenta" en `reserva_detalle.html`.
-4. Test con curl: `curl -o cuenta.pdf http://localhost:8765/club/reservas/1/cuenta/`.
+4. Test con curl: `curl -o cuenta.pdf http://localhost:8000/club/reservas/1/cuenta/`.
 
 Eso suma +2 pts opcionales. Después seguimos con email (+2) y deploy (+3).

@@ -24,13 +24,12 @@ export class Sauna /*implements OnInit*/ {
         this.loading.set(false);
       },
       error: (err: any) => {
-        this.errorMsg = `No se pudo conectar con el backend (${err.status ?? 'sin status'}). Verifica que Django esté corriendo en :8765.`;
+        this.errorMsg = `No se pudo conectar con el backend (${err.status ?? 'sin status'}). Verifica que Django esté corriendo en :8000.`;
         this.loading.set(false);
       },
     })
   } Esto se usara cuando se implemente el endpoint de Camaras de sauna
   */
-  
   camaras: Camara[] = [
     {
       id: 1,
@@ -61,6 +60,11 @@ export class Sauna /*implements OnInit*/ {
       icon_class: "user-check",
     },
   ]
+  /** Número de columnas de la grilla: se ajusta a la cantidad de cámaras (máx. 4 por fila) */
+  public get columnas(): number {
+    return this.camaras.length > 0 ? Math.min(this.camaras.length, 4) : 1;
+  }
+
   public select(camara: Camara) {
     this.camaraSeleccionada.set(camara);
   }

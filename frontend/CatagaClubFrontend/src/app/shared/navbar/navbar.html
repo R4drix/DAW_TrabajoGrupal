@@ -7,16 +7,71 @@
   </a>
 
   <ul class="menu">
-    <li><a routerLink="/">Inicio</a></li>
-    <li><a routerLink="/sauna">Sauna</a></li>
-    <li><a routerLink="/habitaciones">Habitaciones</a></li>
-    <li><a routerLink="/restaurante">Restaurante</a></li>
-    <li><a routerLink="/nosotros">Nosotros</a></li>
+    @if (login.isLogged() && login.user?.permisoAdmin) {
+      <li><a routerLink="/admin">Inicio</a></li>
+      <li><a routerLink="/admin/sauna">Sauna</a></li>
+      <li><a routerLink="/admin/habitaciones">Habitaciones</a></li>
+      <li><a routerLink="/admin/restaurante">Restaurante</a></li>
+      <li><a routerLink="/admin/nosotros">Nosotros</a></li>
+    } @else {
+      <li><a routerLink="/">Inicio</a></li>
+      <li><a routerLink="/sauna">Sauna</a></li>
+      <li><a routerLink="/habitaciones">Habitaciones</a></li>
+      <li><a routerLink="/restaurante">Restaurante</a></li>
+      <li><a routerLink="/nosotros">Nosotros</a></li>
+    }
   </ul>
 
-  <a routerLink="/reservas" class="btn-reserva">
-    <span class="btn-reserva-text">Reserva Ahora</span>
-    <i class="ti ti-arrow-right" aria-hidden="true"></i>
-  </a>
+  <div class="nav-actions">
+    @if (!login.user?.permisoAdmin) {
+      <a routerLink="/reservar" class="btn-reserva">
+        <span class="btn-reserva-text">Reserva Ahora</span>
+        <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </a>
+    }
+
+    <a
+      (click)="toggleMenu($event)"
+      [title]="login.isLogged() ? 'Mi cuenta' : 'Iniciar sesión'"
+      class="user-status"
+      [class.logged-in]="login.isLogged()"
+    >
+      <i class="ti" [ngClass]="login.isLogged() ? 'ti-user-filled' : 'ti-user'" aria-hidden="true"></i>
+    </a>
+  </div>
+  @if (isOpenProfile()) {
+    <div id="user-action-menu" class="dropdown-menu">
+
+      <div class="dropdown-header">
+        <div class="user-avatar">
+          <i class="ti ti-user-filled" aria-hidden="true"></i>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ login.user?.nombre || 'Usuario' }}</span>
+          <span class="user-email">{{ login.user?.email }}</span>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="menu-item info-item">
+        <i class="ti ti-crown" aria-hidden="true"></i>
+        <span>Membresía: <strong>{{ login.user?.membresia || 'Estándar' }}</strong></span>
+      </div>
+
+      <div class="menu-item info-item">
+        <i class="ti ti-calendar-event" aria-hidden="true"></i>
+        <span>Reservas activas: <strong>{{ login.user?.reservasActivas ?? 0 }}</strong></span>
+      </div>
+
+      <hr>
+
+      <button type="button" (click)="logout()" class="menu-item logout">
+        <i class="ti ti-logout" aria-hidden="true"></i>
+        Cerrar sesión
+      </button>
+
+    </div>
+  }
 
 </nav>

@@ -201,11 +201,11 @@ class ReservaTotalTest(TestCase):
 
 ```bash
 # Estado del servidor
-curl -i http://localhost:8765/club/api/dashboard/
+curl -i http://localhost:8000/club/api/dashboard/
 
 # Crear habitación (requiere login + CSRF)
 # Ver sección 2.1 del README raíz para el flujo completo con curl
 
 # Acceder al admin
-# http://localhost:8765/admin/ (usuario: admin, pass: admin123)
+# http://localhost:8000/admin/ (usuario: admin, pass: admin123)
 ```

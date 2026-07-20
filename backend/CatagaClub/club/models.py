@@ -17,6 +17,9 @@ class Cliente(models.Model):
         return self.nombre
 
 
+from django.db import models
+from django.core.exceptions import ValidationError
+
 class Habitacion(models.Model):
     TIPO_CHOICES = [
         ('Individual', 'Individual'),
@@ -31,6 +34,12 @@ class Habitacion(models.Model):
     esta_ocupada = models.BooleanField(default=False)
     capacidad = models.PositiveIntegerField(default=2)
 
+    # --- NUEVOS CAMPOS PARA LAS 4 VISTAS ---
+    imagen_principal = models.CharField(max_length=500, blank=True, null=True, help_text="Vista general de la habitación")
+    imagen_cama = models.CharField(max_length=500, blank=True, null=True, help_text="Foto detallada de la cama")
+    imagen_bano = models.CharField(max_length=500, blank=True, null=True, help_text="Foto del cuarto de baño")
+    imagen_extra = models.CharField(max_length=500, blank=True, null=True, help_text="Detalles adicionales (jacuzzi, sauna o decoración)")
+
     class Meta:
         ordering = ['numero']
 
@@ -42,7 +51,6 @@ class Habitacion(models.Model):
             raise ValidationError({'precio_por_noche': 'El precio debe ser mayor a 0.'})
         if self.numero is not None and self.numero <= 0:
             raise ValidationError({'numero': 'El número de habitación debe ser positivo.'})
-
 
 class Reserva(models.Model):
     ESTADO_CHOICES = [
@@ -72,14 +80,12 @@ class Reserva(models.Model):
             return max(delta, 0)
         return 0
 
-    def calcular_total(self):
-        costo_habitacion = Decimal(str(self.habitacion.precio_por_noche)) * Decimal(self.noches)
-        costo_consumos = sum(
-            (Decimal(str(c.precio)) * Decimal(str(c.cantidad)))
-            for c in self.cliente.consumos_restaurante.filter(fecha__gte=self.fecha_checkin)
-        )
-        return costo_habitacion + costo_consumos
 
+    def calcular_total(self):
+        # Ahora el total es únicamente el costo de la habitación por las noches de estadía
+        costo_habitacion = Decimal(str(self.habitacion.precio_por_noche)) * Decimal(self.noches)
+        return costo_habitacion
+    
     def save(self, *args, **kwargs):
         if self.fecha_checkin and self.fecha_checkout:
             if self.fecha_checkout <= self.fecha_checkin:
@@ -89,25 +95,26 @@ class Reserva(models.Model):
         Reserva.objects.filter(pk=self.pk).update(total_acumulado=self.total_acumulado)
 
 
-class ConsumoRestaurante(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='consumos_restaurante')
-    descripcion_plato = models.CharField(max_length=100)
-    precio = models.DecimalField(max_digits=8, decimal_places=2)
-    cantidad = models.PositiveIntegerField(default=1)
-    fecha = models.DateTimeField(auto_now_add=True)
+class Plato(models.Model):
+    CATEGORIAS = [
+        ('extras', 'Extras / Platos'),
+        ('guarniciones', 'Guarniciones'),
+        ('sandwiches', 'Sándwiches'),
+        ('salchipapas', 'Salchipapas'),
+        ('bebidas', 'Bebidas'),
+        ('bebidas_calientes', 'Bebidas Calientes'),
+        ('jugos', 'Jugos Naturales'),
+        ('cocteles', 'Cócteles'),
+        ('postres', 'Postres'),
+        ('frapps', 'Frapps'),
+    ]
 
-    class Meta:
-        ordering = ['-fecha']
+    nombre = models.CharField(max_length=150)
+    descripcion = models.TextField(blank=True, null=True)
+    precio = models.DecimalField(max_digits=6, decimal_places=2)
+    imagen_url = models.URLField(max_length=500, blank=True, default='') 
+    categoria = models.CharField(max_length=30, choices=CATEGORIAS, default='extras')
+    disponible = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.cantidad}x {self.descripcion_plato} ({self.cliente.nombre})"
-
-    @property
-    def subtotal(self):
-        return Decimal(str(self.precio)) * Decimal(str(self.cantidad))
-
-    def clean(self):
-        if self.precio is not None and self.precio <= 0:
-            raise ValidationError({'precio': 'El precio debe ser mayor a 0.'})
-        if self.cantidad is not None and self.cantidad <= 0:
-            raise ValidationError({'cantidad': 'La cantidad debe ser mayor a 0.'})
+        return f"{self.nombre} ({self.categoria})"

@@ -1,10 +1,21 @@
+export interface User {
+  nombre: string,
+  email: string,
+  membresia: string,
+  reservasActivas: string,
+  permisoAdmin: boolean,
+}
 export interface Habitacion {
   id: number;
   numero: number;
   tipo: string;
   precio_por_noche: number;
-  capacidad: number;
   esta_ocupada: boolean;
+  capacidad: number;
+  imagen_principal: string;
+  imagen_cama: string;
+  imagen_bano: string;
+  imagen_extra: string;
 }
 
 export interface Camara {

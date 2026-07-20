@@ -1,0 +1,189 @@
+.carta-seccion {
+    background-color: #0d0d0d;
+    padding: 60px 10%;
+    text-align: center;
+    border-top: 1px solid rgba(201, 168, 76, 0.1);
+}
+
+.carta-seccion h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: #ffffff !important;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Estilos de botones filtros de Categoría */
+.categorias-filter {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 50px;
+}
+
+.categorias-filter button {
+    background-color: #1a1a1a;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    color: #aaaaaa;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.categorias-filter button:hover,
+.categorias-filter button.active {
+    background-color: #c9a84c;
+    color: #0d0d0d;
+    border-color: #c9a84c;
+    font-weight: 600;
+}
+
+/* Mensajes de carga/error */
+.carta-mensaje {
+    color: #aaaaaa;
+    font-weight: 300;
+    font-size: 1.1rem;
+    margin: 40px 0;
+}
+
+.carta-error {
+    color: #e07a7a;
+}
+
+/* Grid de Platos */
+.platos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* Tarjetas de los Platos */
+.plato-card {
+    background-color: #121212;
+    border: 1px solid rgba(201, 168, 76, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.plato-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(201, 168, 76, 0.6);
+}
+
+/* Imagen del Plato */
+.plato-imagen-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background-color: #1a1a1a;
+}
+
+.plato-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.plato-categoria-tag {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgba(13, 13, 13, 0.85);
+    color: #c9a84c;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(201, 168, 76, 0.4);
+}
+
+/* Información del Plato */
+.plato-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.plato-nombre {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: #ffffff;
+    margin: 0 0 10px 0;
+}
+
+.plato-descripcion {
+    font-size: 0.85rem;
+    color: #aaaaaa;
+    line-height: 1.4;
+    margin: 0 0 20px 0;
+    flex-grow: 1;
+}
+
+.plato-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(201, 168, 76, 0.1);
+    padding-top: 15px;
+}
+
+.plato-precio {
+    font-size: 1.2rem;
+    color: #c9a84c;
+    font-weight: 600;
+}
+
+.platos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
+}
+
+.plato-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plato-card:hover {
+    transform: translateY(-5px); /* Eleva suavemente la tarjeta */
+    box-shadow: 0 8px 25px rgba(201, 168, 76, 0.2); /* Sombra con el tono dorado */
+}
+
+.plato-imagen-container {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.plato-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.plato-card:hover .plato-imagen {
+    transform: scale(1.1); /* Efecto zoom dentro del contenedor */
+}
+/* Ajustes Responsive */
+@media (max-width: 900px) {
+    .carta-seccion {
+        padding: 60px 24px;
+    }
+}
+

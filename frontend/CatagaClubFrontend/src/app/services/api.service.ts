@@ -13,8 +13,9 @@ import { Consumo, Dashboard, Habitacion, Reserva } from './models';
 export class ApiService {
   private readonly http = inject(HttpClient);
 
-  // En desarrollo: Django corre en :8765 y Angular en :4200
-  private readonly baseUrl = 'https://dawtrabajogrupal-production.up.railway.app/club/api';
+  // En desarrollo: Django corre en :8000 y Angular en :4200
+  private readonly baseUrl = 'http://localhost:8000/club/api';
+  private apiUrl = 'http://localhost:8000/club/api';
 
   getEstadoHabitaciones(): Observable<{ ok: boolean; count: number; habitaciones: Habitacion[] }> {
     return this.http.get<{ ok: boolean; count: number; habitaciones: Habitacion[] }>(`${this.baseUrl}/estado/`);
@@ -31,4 +32,13 @@ export class ApiService {
   getDashboard(): Observable<Dashboard> {
     return this.http.get<Dashboard>(`${this.baseUrl}/dashboard/`);
   }
+
+  getHabitacionesDisponibles(params: { personas: number; llegada: string; salida: string }): Observable<Habitacion[]> {
+    return this.http.get<Habitacion[]>(`${this.apiUrl}/habitaciones/disponibles/`, { params });
+  }
+
+  crearReserva(reservaData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reservas/`, reservaData);
+  }
+
 }
