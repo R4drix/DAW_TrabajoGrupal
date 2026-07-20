@@ -11,7 +11,8 @@ export class LoginService {
         'email': 'abc@gmail.com',
         'membresia': 'nose',
         'nombre': 'Shy',
-        'reservasActivas': 'mmm'
+        'reservasActivas': 'mmm',
+        'permisoAdmin': true,
     };
 
     public isLogged = signal<Boolean>(true);

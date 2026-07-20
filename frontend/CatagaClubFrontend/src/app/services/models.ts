@@ -3,6 +3,7 @@ export interface User {
   email: string,
   membresia: string,
   reservasActivas: string,
+  permisoAdmin: boolean,
 }
 export interface Habitacion {
   id: number;

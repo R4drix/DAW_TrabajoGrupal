@@ -24,8 +24,9 @@ export class Navbar {
   }
 
   public logout() {
-    
     this.login.logout();
+    this.login.user = null;
+    this.router.navigate([''])
   }
 
   @HostListener('document:click')

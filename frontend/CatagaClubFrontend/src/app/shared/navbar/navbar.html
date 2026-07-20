@@ -7,18 +7,28 @@
   </a>
 
   <ul class="menu">
-    <li><a routerLink="/">Inicio</a></li>
-    <li><a routerLink="/sauna">Sauna</a></li>
-    <li><a routerLink="/habitaciones">Habitaciones</a></li>
-    <li><a routerLink="/restaurante">Restaurante</a></li>
-    <li><a routerLink="/nosotros">Nosotros</a></li>
+    @if (login.isLogged() && login.user?.permisoAdmin) {
+      <li><a routerLink="/admin">Inicio</a></li>
+      <li><a routerLink="/admin/sauna">Sauna</a></li>
+      <li><a routerLink="/admin/habitaciones">Habitaciones</a></li>
+      <li><a routerLink="/admin/restaurante">Restaurante</a></li>
+      <li><a routerLink="/admin/nosotros">Nosotros</a></li>
+    } @else {
+      <li><a routerLink="/">Inicio</a></li>
+      <li><a routerLink="/sauna">Sauna</a></li>
+      <li><a routerLink="/habitaciones">Habitaciones</a></li>
+      <li><a routerLink="/restaurante">Restaurante</a></li>
+      <li><a routerLink="/nosotros">Nosotros</a></li>
+    }
   </ul>
 
   <div class="nav-actions">
-    <a routerLink="/reservar" class="btn-reserva">
-      <span class="btn-reserva-text">Reserva Ahora</span>
-      <i class="ti ti-arrow-right" aria-hidden="true"></i>
-    </a>
+    @if (!login.user?.permisoAdmin) {
+      <a routerLink="/reservar" class="btn-reserva">
+        <span class="btn-reserva-text">Reserva Ahora</span>
+        <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </a>
+    }
 
     <a
       (click)="toggleMenu($event)"
