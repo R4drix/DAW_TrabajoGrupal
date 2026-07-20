@@ -32,6 +32,8 @@ urlpatterns = [
 
     # Restaurante
     path('api/club/platos/', views.lista_platos_api, name='lista_platos_api'),
+    # Sauna
+    path('api/camaras/', views.api_camaras, name='api_camaras'),
     # API JSON
     path('api/estado/', views.estado_habitaciones_api, name='api_estado'),
     path('api/auth/login/', views.api_login_admin, name='api_login_admin'),

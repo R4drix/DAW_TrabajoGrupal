@@ -16,7 +16,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 from django.views.decorators.csrf import csrf_exempt  
 from .forms import (ClienteForm, HabitacionForm,
                     ReservaForm)
-from .models import Cliente, Habitacion, Reserva, Plato
+from .models import Cliente, Habitacion, Reserva, Plato, Camara
 
 
 class PublicListMixin:
@@ -197,7 +197,24 @@ def lista_platos_api(request):
         # Esto nos ayudará a ver el error real en la consola de Django
         print("ERROR EN API PLATOS:", str(e))
         return JsonResponse({"error": str(e)}, status=500)
-    
+
+
+@require_GET
+def api_camaras(request):
+    """Devuelve las cámaras del sauna del hotel (seco, vapor, jacuzzi, privada, etc.).
+    La forma del JSON coincide con la interfaz Camara de models.ts en el frontend.
+    """
+    camaras = Camara.objects.all().order_by('orden', 'id')
+    data = [{
+        'id':          c.id,
+        'tipo':        c.tipo,
+        'descripcion': c.descripcion,
+        'capacidad':   c.capacidad,
+        'icon_class':  c.icon_class,
+    } for c in camaras]
+    return JsonResponse({'ok': True, 'count': len(data), 'camaras': data}, safe=False)
+
+
 # ── APIs JSON ─────────────────────────────────────────────────────────────────
 import json
 import random
