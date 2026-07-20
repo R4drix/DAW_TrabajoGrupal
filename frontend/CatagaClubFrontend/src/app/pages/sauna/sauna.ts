@@ -1,65 +1,35 @@
-import { Component, inject, /*OnInit,*/ signal } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { Camara } from '../../services/models';
 import { ApiService } from '../../services/api.service';
+
 @Component({
   selector: 'app-sauna',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './sauna.html',
   styleUrl: './sauna.css',
 })
-export class Sauna /*implements OnInit*/ {
+export class Sauna implements OnInit {
   private readonly api = inject(ApiService);
-  //camaras: Camara[] = [];
-  loading = signal(false); // False por el momento
-  errorMsg = 'No se pudo cargar las camaras del sauna';
+
+  camaras: Camara[] = [];
+  loading = signal(true);
+  errorMsg = '';
   camaraSeleccionada = signal<Camara | null>(null);
 
-  /*
   ngOnInit(): void {
     this.api.getCamaras().subscribe({
-      next: (resp: any) => {
+      next: (resp) => {
         this.camaras = resp.camaras ?? [];
         this.loading.set(false);
       },
-      error: (err: any) => {
+      error: (err) => {
         this.errorMsg = `No se pudo conectar con el backend (${err.status ?? 'sin status'}). Verifica que Django esté corriendo en :8000.`;
         this.loading.set(false);
       },
-    })
-  } Esto se usara cuando se implemente el endpoint de Camaras de sauna
-  */
-  camaras: Camara[] = [
-    {
-      id: 1,
-      tipo: "Sauna Seco",
-      descripcion: "Calor seco con piedras volcánicas para eliminar toxinas y mejorar la circulación.",
-      capacidad: 0,
-      icon_class: "flame",
-    },
-    {
-      id: 2,
-      tipo: "Cámara de Vapor",
-      descripcion: "Baño turco con sutiles aromas a eucalipto para purificar el sistema respiratorio.",
-      capacidad: 80,
-      icon_class: "wind",
-    },
-    {
-      id: 3,
-      tipo: "Jacuzzi & Relax",
-      descripcion: "Aguas termales con chorros de hidromasaje para aliviar la tensión muscular.",
-      capacidad: 120,
-      icon_class: "bath",
-    },
-    {
-      id: 4,
-      tipo: "Camara privada",
-      descripcion: "Un espacio exclusivo que ofrece total privacidad para una persona o un grupo de amigos",
-      capacidad: 200,
-      icon_class: "user-check",
-    },
-  ]
+    });
+  }
+
   /** Número de columnas de la grilla: se ajusta a la cantidad de cámaras (máx. 4 por fila) */
   public get columnas(): number {
     return this.camaras.length > 0 ? Math.min(this.camaras.length, 4) : 1;

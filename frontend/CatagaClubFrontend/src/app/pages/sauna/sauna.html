@@ -7,9 +7,6 @@
       Desconéctate del mundo exterior y sumérgete en una experiencia 
       diseñada para purificar el cuerpo y calmar la mente.
     </p>
-    <button class="btn-hero">
-      Reservar Sesión
-    </button>
   </div>
 </section>
 
@@ -22,7 +19,6 @@
         <div
           class="card"
           [class.card-activa]="camaraSeleccionada()?.id === camara.id"
-          routerLink="{{camara.id}}"
           (mouseenter)="select(camara)"
           (mouseleave)="deselect()"
         >

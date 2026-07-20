@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Consumo, Dashboard, Habitacion, Reserva } from './models';
+import { Consumo, Dashboard, Habitacion, Reserva, Camara } from './models';
 
 /**
  * Servicio único de acceso a la API del backend Django.
@@ -31,6 +31,10 @@ export class ApiService {
 
   getDashboard(): Observable<Dashboard> {
     return this.http.get<Dashboard>(`${this.baseUrl}/dashboard/`);
+  }
+
+  getCamaras(): Observable<{ ok: boolean; count: number; camaras: Camara[] }> {
+    return this.http.get<{ ok: boolean; count: number; camaras: Camara[] }>(`${this.baseUrl}/camaras/`);
   }
 
   getHabitacionesDisponibles(params: { personas: number; llegada: string; salida: string }): Observable<Habitacion[]> {
