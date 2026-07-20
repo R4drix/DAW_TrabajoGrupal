@@ -91,6 +91,54 @@ nav {
 }
 
 /* ==========================
+   INDICADOR DE USUARIO
+========================== */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: 40px;
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.user-status:hover {
+  border-color: var(--gold);
+}
+
+.user-status i {
+  font-size: 17px;
+  color: transparent;
+  -webkit-text-stroke: 1.3px #cccccc;
+  transition: 0.3s;
+}
+
+.user-status:hover i {
+  -webkit-text-stroke-color: var(--gold);
+}
+
+/* usuario logueado: icono relleno del mismo dorado que el botón de reserva */
+.user-status.logged-in {
+  border-color: var(--gold);
+  background: rgba(201, 168, 76, 0.1);
+}
+
+.user-status.logged-in i {
+  color: var(--gold);
+  -webkit-text-stroke: 0;
+}
+
+/* ==========================
    BOTÓN RESERVA
 ========================== */
 .btn-reserva {
@@ -105,7 +153,6 @@ nav {
   color: var(--black);
   background: var(--gold);
   padding: 14px 28px;
-  margin-left: 40px;
   white-space: nowrap;
   transition: 0.3s;
 }
@@ -147,9 +194,13 @@ nav {
     justify-content: center;
   }
 
-  .btn-reserva {
+  .nav-actions {
     width: 100%;
-    justify-content: center;
     margin-left: 0;
+  }
+
+  .btn-reserva {
+    flex: 1;
+    justify-content: center;
   }
 }
