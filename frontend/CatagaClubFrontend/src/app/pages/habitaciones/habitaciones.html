@@ -7,7 +7,6 @@
   @if (loading()) {
     <div class="alert alert-info">Cargando catálogo...</div>
   } @else {
-    
     <div class="lista-habitaciones">
       @for (h of habitaciones; track h.id) {
         <article class="tarjeta-habitacion">

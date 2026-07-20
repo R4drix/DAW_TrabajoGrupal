@@ -1,0 +1,56 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <i class="ti ti-shield-lock gold-icon"></i>
+      <h2>CÁTAGA CLUB</h2>
+      <p>Acceso Privado a Conserjería</p>
+    </div>
+
+    <div class="error-toast" *ngIf="errorMessage">
+      <i class="ti ti-alert-circle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="input-group">
+        <label for="username">Usuario Maestro</label>
+        <div class="input-container">
+          <i class="ti ti-user"></i>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            [(ngModel)]="username" 
+            placeholder="ej. recepcion_cayma" 
+            required>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Contraseña de Seguridad</label>
+        <div class="input-container">
+          <i class="ti ti-lock"></i>
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            name="password" 
+            [(ngModel)]="password" 
+            placeholder="••••••••" 
+            required>
+          
+          <button 
+            type="button" 
+            class="toggle-password-btn" 
+            (click)="togglePasswordVisiblity()">
+            <i class="ti" [ngClass]="showPassword ? 'ti-eye-off' : 'ti-eye'"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" [disabled]="isLoading">
+        <span>{{ isLoading ? 'Validando en Cataga-DB...' : 'Ingresar al Sistema' }}</span>
+        <i class="ti ti-arrow-right" *ngIf="!isLoading"></i>
+      </button>
+    </form>
+  </div>
+</div>

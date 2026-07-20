@@ -5,12 +5,10 @@ export interface Habitacion {
   precio_por_noche: number;
   esta_ocupada: boolean;
   capacidad: number;
-  
-  // ── ¡ASEGÚRATE DE QUE ESTAS 4 LÍNEAS ESTÉN AQUÍ DECLARADAS! ──
-  imagen_principal?: string;
-  imagen_cama?: string;
-  imagen_bano?: string;
-  imagen_extra?: string;
+  imagen_principal: string;
+  imagen_cama: string;
+  imagen_bano: string;
+  imagen_extra: string;
 }
 
 export interface Camara {

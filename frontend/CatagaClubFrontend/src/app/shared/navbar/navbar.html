@@ -14,9 +14,15 @@
     <li><a routerLink="/nosotros">Nosotros</a></li>
   </ul>
 
-  <a routerLink="/reservar" class="btn-reserva">
-    <span class="btn-reserva-text">Reserva Ahora</span>
-    <i class="ti ti-arrow-right" aria-hidden="true"></i>
-  </a>
+  <div class="nav-actions">
+    <a routerLink="/reservar" class="btn-reserva">
+      <span class="btn-reserva-text">Reserva Ahora</span>
+      <i class="ti ti-arrow-right" aria-hidden="true"></i>
+    </a>
+
+    <a routerLink="/login" class="user-status" [class.logged-in]="login.isLogged" [title]="login.isLogged ? 'Mi cuenta' : 'Iniciar sesión'">
+      <i class="ti" [ngClass]="login.isLogged ? 'ti-user-filled' : 'ti-user'" aria-hidden="true"></i>
+    </a>
+  </div>
 
 </nav>

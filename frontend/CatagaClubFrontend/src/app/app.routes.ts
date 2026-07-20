@@ -8,15 +8,21 @@ import { DashboardComponent } from './pages/dashboard/dashboard';
 import { Reservas } from './pages/reservas/reservas';
 import { Restaurante } from './pages/restaurante/restaurante';
 import { ReservarWizard } from './pages/reservar/reservar';
+import { Login } from './pages/login/login';
 
 export const routes: Routes = [
   {
-    path: 'reservar',
-    component: ReservarWizard,
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
   },
   {
-    path: '',
-    component: Home,
+    path: 'home',
+    component: Home
+  },
+  {
+    path: 'reservar',
+    component: ReservarWizard,
   },
   {
     path: 'habitaciones',
@@ -41,5 +47,9 @@ export const routes: Routes = [
   {
     path: 'reservas',
     component: Reservas,
+  },
+  {
+    path: 'login',
+    component: Login,
   },
 ];
