@@ -1,3 +1,9 @@
+export interface User {
+  nombre: string,
+  email: string,
+  membresia: string,
+  reservasActivas: string,
+}
 export interface Habitacion {
   id: number;
   numero: number;
