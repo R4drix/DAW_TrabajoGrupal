@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Cliente, Habitacion, Reserva, Plato
+from .models import Cliente, Habitacion, Reserva, Plato, Camara
 
 
 @admin.register(Cliente)
@@ -21,4 +21,10 @@ class ReservaAdmin(admin.ModelAdmin):
     list_display = ('id', 'cliente', 'habitacion', 'fecha_checkin', 'fecha_checkout', 'estado', 'total_acumulado')
     list_filter = ('estado',)
     search_fields = ('cliente__nombre',)
+
+
+@admin.register(Camara)
+class CamaraAdmin(admin.ModelAdmin):
+    list_display = ('tipo', 'capacidad', 'icon_class', 'orden')
+    ordering = ('orden',)
 

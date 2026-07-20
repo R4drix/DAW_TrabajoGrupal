@@ -118,3 +118,25 @@ class Plato(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.categoria})"
+
+
+class Camara(models.Model):
+    """Cámara/espacio del sauna del hotel (seco, vapor, jacuzzi, privada, etc.).
+    Los campos reflejan exactamente la interfaz Camara de models.ts en el frontend.
+    """
+    tipo = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True, default='')
+    capacidad = models.PositiveIntegerField(default=0, help_text='0 = uso individual / sin límite fijo')
+    icon_class = models.CharField(
+        max_length=50, blank=True, default='flame',
+        help_text='Nombre del ícono de Tabler Icons usado en el frontend (ej. flame, wind, bath)'
+    )
+    orden = models.PositiveIntegerField(default=0, help_text='Orden de aparición en la vista de sauna')
+
+    class Meta:
+        ordering = ['orden', 'id']
+        verbose_name = 'Cámara de sauna'
+        verbose_name_plural = 'Cámaras de sauna'
+
+    def __str__(self):
+        return self.tipo
