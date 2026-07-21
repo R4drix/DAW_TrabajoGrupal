@@ -2,6 +2,7 @@ from decimal import Decimal
 import json
 
 from django.contrib import messages
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Sum
@@ -203,6 +204,57 @@ import random
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import Reserva, Cliente, Habitacion
+
+
+@csrf_exempt
+def api_login_admin(request):
+    """
+    Login JSON para Angular.
+    Solo permite el acceso a usuarios con is_staff=True
+    (is_superuser implica is_staff, por lo que el superusuario también entra).
+    """
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'Método no permitido.'}, status=405)
+
+    try:
+        body = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        return JsonResponse({'ok': False, 'error': 'JSON inválido.'}, status=400)
+
+    username = (body.get('username') or '').strip()
+    password = body.get('password') or ''
+
+    if not username or not password:
+        return JsonResponse(
+            {'ok': False, 'error': 'Usuario y contraseña son obligatorios.'},
+            status=400,
+        )
+
+    user = authenticate(request, username=username, password=password)
+
+    if user is None:
+        return JsonResponse(
+            {'ok': False, 'error': 'Credenciales incorrectas.'},
+            status=401,
+        )
+
+    if not user.is_staff:
+        return JsonResponse(
+            {'ok': False, 'error': 'No tiene permisos de administrador.'},
+            status=403,
+        )
+
+    return JsonResponse({
+        'ok': True,
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+        },
+    }, status=200)
+
 
 @csrf_exempt
 def api_reservas(request):

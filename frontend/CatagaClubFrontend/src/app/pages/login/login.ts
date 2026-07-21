@@ -15,16 +15,16 @@ export class Login {
   password = '';
   errorMessage = '';
   isLoading = false;
-  showPassword = false; 
-  
+  showPassword = false;
+
   private router = inject(Router);
-  private login = inject(LoginService)
+  private login = inject(LoginService);
 
   togglePasswordVisiblity() {
     this.showPassword = !this.showPassword;
   }
 
-  async onSubmit() {
+  onSubmit() {
     if (!this.username || !this.password) {
       this.errorMessage = 'Por favor, rellene todos los campos.';
       return;
@@ -34,16 +34,26 @@ export class Login {
     this.errorMessage = '';
 
     this.login.login(this.username, this.password).subscribe({
-      next: (res: any) => {
-        this.login.isLogged.set(true);
-        this.login.user = res;
-        console.log('Se logueo ....(logica)');
-        this.router.navigate(['/home'])
+      next: (res) => {
+        if (res.ok && res.user && res.user.is_staff) {
+          this.login.user = res.user;
+          this.login.isLogged.set(true);
+          this.router.navigate(['/admin']);
+        } else {
+          this.errorMessage =
+            res.error || 'No tiene permisos de administrador.';
+        }
+        this.isLoading = false;
       },
       error: (err) => {
-        console.log('Ocurrio un error', err);
-        
-      }
-    })
+        const backendMsg = err?.error?.error;
+        this.errorMessage =
+          backendMsg ||
+          (err.status === 0
+            ? 'No se pudo conectar con el servidor.'
+            : 'Error al iniciar sesión.');
+        this.isLoading = false;
+      },
+    });
   }
 }

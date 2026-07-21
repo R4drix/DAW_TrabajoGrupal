@@ -1,0 +1,106 @@
+<div class="admin-shell" [class.collapsed]="sidebarCollapsed()">
+
+  <!-- ==========================
+       SIDEBAR
+  ========================== -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <i class="ti ti-hotel-service" aria-hidden="true"></i>
+      </div>
+      <span class="brand-text">Cátaga</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a routerLink="/admin/reservas" routerLinkActive="active" class="nav-item">
+        <i class="ti ti-calendar-event" aria-hidden="true"></i>
+        <span class="nav-label">Reservas</span>
+      </a>
+      <a routerLink="/admin/rooms" routerLinkActive="active" class="nav-item">
+        <i class="ti ti-door" aria-hidden="true"></i>
+        <span class="nav-label">Rooms</span>
+      </a>
+      <a routerLink="/admin/sauna" routerLinkActive="active" class="nav-item">
+        <i class="ti ti-flame" aria-hidden="true"></i>
+        <span class="nav-label">Sauna</span>
+      </a>
+      <a routerLink="/admin/comidas" routerLinkActive="active" class="nav-item">
+        <i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>
+        <span class="nav-label">Comidas</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ==========================
+       MAIN AREA
+  ========================== -->
+  <div class="admin-main">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+      <button class="sidebar-toggle" (click)="toggleSidebar()" type="button" aria-label="Colapsar sidebar">
+        <i class="ti ti-menu-2" aria-hidden="true"></i>
+      </button>
+
+      <div class="header-search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="text" placeholder="Buscar reserva, habitación, cliente..." />
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn" type="button" aria-label="Notificaciones">
+          <i class="ti ti-bell" aria-hidden="true"></i>
+          <span class="badge-dot"></span>
+        </button>
+
+        <div class="profile-wrapper">
+          <button class="profile-chip" (click)="toggleMenu($event)" type="button">
+            <div class="profile-avatar">
+              <i class="ti ti-user-filled" aria-hidden="true"></i>
+            </div>
+            <div class="profile-info">
+              <span class="profile-name">{{ login.user?.username || 'Admin' }}</span>
+              <span class="profile-role">
+                {{ login.user?.is_superuser ? 'Superusuario' : (login.user?.is_staff ? 'Administrador' : 'Estándar') }}
+              </span>
+            </div>
+            <i class="ti ti-chevron-down" aria-hidden="true"></i>
+          </button>
+
+          @if (isOpenProfile()) {
+            <div class="profile-dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-header">
+                <div class="profile-avatar lg">
+                  <i class="ti ti-user-filled" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <div class="profile-name">{{ login.user?.username || 'Admin' }}</div>
+                  <div class="profile-email">{{ login.user?.email }}</div>
+                </div>
+              </div>
+              <hr />
+              <div class="dropdown-info">
+                <i class="ti ti-shield" aria-hidden="true"></i>
+                <span>Rol: <strong>{{ login.user?.is_superuser ? 'Superusuario' : (login.user?.is_staff ? 'Administrador' : 'Estándar') }}</strong></span>
+              </div>
+              <hr />
+              <button type="button" (click)="logout()" class="dropdown-item logout">
+                <i class="ti ti-logout" aria-hidden="true"></i>
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- ROUTED CONTENT -->
+    <main class="admin-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
