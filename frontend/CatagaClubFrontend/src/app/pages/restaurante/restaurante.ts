@@ -34,13 +34,15 @@ export class Restaurante implements OnInit {
     this.obtenerPlatos();
   }
 
-  /** Llama al backend de Django para traer todos los platos */
+
+/** Llama al backend de Django para traer todos los platos */
   public obtenerPlatos(): void {
     this.cargando.set(true);
     this.error.set(null);
 
-    // TODO: Ajusta la URL de acuerdo a tu backend local (ej. 'http://localhost:8000/club/api/platos/')
-    this.http.get<Plato[]>('http://localhost:8000/club/api/club/platos/').subscribe({
+    // 🔴 ANTES: 'http://localhost:8000/club/api/club/platos/'
+    // 🟢 AHORA (URL corregida):
+    this.http.get<Plato[]>('http://localhost:8000/club/api/platos/').subscribe({
       next: (data) => {
         // Filtrar únicamente los platos marcados como disponibles
         const platosDisponibles = data.filter(plato => plato.disponible);

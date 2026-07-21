@@ -10,7 +10,7 @@ export class AdminService {
     //No se que se manda con put :v
         return this.http.put(this.url, id /* ??? */)
     }
-    public getHabitaciones() {
-        return this.http.get(this.url + '/getHabitaciones');
+    getHabitaciones() {
+        return this.http.get('http://localhost:8000/club/api/estado-habitaciones/');
     }
 }

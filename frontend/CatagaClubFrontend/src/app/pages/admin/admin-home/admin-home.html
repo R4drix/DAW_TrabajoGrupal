@@ -1,238 +1,126 @@
-<!-- ==========================
-     PAGE HEADER
-========================== -->
-<div class="page-head">
-  <div>
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-sub">Resumen general del Cátaga Club</p>
+<div class="dash-container">
+  <!-- Encabezado Principal -->
+  <header class="dash-header">
+    <div class="header-titles">
+      <h1>Panel Control Principal</h1>
+      <p>Resumen general de operaciones de Cátaga Club</p>
+    </div>
+    <button class="btn-refresh" (click)="cargarTodo()">
+      Actualizar Datos
+    </button>
+  </header>
+
+  <!-- Tarjetas KPI -->
+  <div class="kpi-grid">
+    <!-- Total Recaudado -->
+    <div class="kpi-card highlight">
+      <div class="kpi-data">
+        <span class="kpi-label">Ingresos Registrados</span>
+        <h3 class="kpi-value">S/ {{ ingresosTotales() | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+
+    <!-- Habitaciones Ocupadas -->
+    <div class="kpi-card">
+      <div class="kpi-data">
+        <span class="kpi-label">Habitaciones Ocupadas</span>
+        <h3 class="kpi-value">{{ habsOcupadas() }} / {{ totalHabs() }}</h3>
+      </div>
+    </div>
+
+    <!-- Reservas Activas -->
+    <div class="kpi-card">
+      <div class="kpi-data">
+        <span class="kpi-label">Reservas Activas</span>
+        <h3 class="kpi-value">{{ reservasActivas() }}</h3>
+      </div>
+    </div>
+
+    <!-- Clientes en Sauna -->
+    <div class="kpi-card">
+      <div class="kpi-data">
+        <span class="kpi-label">Personas en Sauna</span>
+        <h3 class="kpi-value">{{ personasSaunaHoy() }} pers.</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="dash-content-grid">
+    <!-- Feed de Actividad Unificada -->
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <h2>Últimas Transacciones y Movimientos</h2>
+      </div>
+
+      <div class="table-responsive">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>MÓDULO</th>
+              <th>DETALLE / TITULAR</th>
+              <th>DESCRIPCIÓN</th>
+              <th>MONTO</th>
+              <th>ESTADO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of actividadReciente">
+              <td>
+                <span class="module-tag">{{ item.tipo }}</span>
+              </td>
+              <td class="font-semibold">{{ item.titulo }}</td>
+              <td class="text-muted small-text">{{ item.subtitulo }}</td>
+              <td class="font-bold">S/ {{ item.monto | number:'1.2-2' }}</td>
+              <td>
+                <span class="badge-status" [ngClass]="item.estadoBadge">
+                  Registrado
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="actividadReciente.length === 0 && !cargando()">
+              <td colspan="5" class="empty-state">No hay actividades registradas por el momento.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Panel Lateral -->
+    <div class="side-panel">
+      <!-- Módulo Rápido Sauna -->
+      <div class="card-custom side-card">
+        <div class="card-header-custom">
+          <h2>Resumen Sauna</h2>
+        </div>
+        <div class="card-body-custom">
+          <div class="summary-item">
+            <span>Total Recaudado Sauna</span>
+            <strong>S/ {{ totalSaunaMonto() | number:'1.2-2' }}</strong>
+          </div>
+          <div class="summary-item">
+            <span>Tickets Emitidos</span>
+            <strong>{{ registrosSauna().length }} entradas</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Módulo Rápido Habitaciones -->
+      <div class="card-custom side-card mt-3">
+        <div class="card-header-custom">
+          <h2>Ocupación de Suites</h2>
+        </div>
+        <div class="card-body-custom">
+          <div class="summary-item">
+            <span>Disponibles</span>
+            <strong class="text-success">{{ totalHabs() - habsOcupadas() }} libres</strong>
+          </div>
+          <div class="summary-item">
+            <span>Ocupadas</span>
+            <strong class="text-danger">{{ habsOcupadas() }} en uso</strong>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
-<!-- LOADING / ERROR -->
-<div *ngIf="loading()" class="state-box">Cargando métricas...</div>
-<div *ngIf="errorMsg()" class="state-box error">{{ errorMsg() }}</div>
-
-<ng-container *ngIf="!loading() && data">
-
-  <!-- ==========================
-       KPI ROW
-  ========================== -->
-  <section class="kpi-row">
-    <div class="kpi-card" *ngFor="let kpi of kpis">
-      <div class="kpi-top">
-        <span class="kpi-title">{{ kpi.title }}</span>
-        <i class="ti ti-dots-vertical" aria-hidden="true"></i>
-      </div>
-      <div class="kpi-value">{{ kpi.value }}</div>
-      <div class="kpi-delta" [class.up]="kpi.trend === 'up'" [class.down]="kpi.trend === 'down'">
-        <i class="ti" [ngClass]="kpi.trend === 'up' ? 'ti-arrow-up-right' : 'ti-arrow-down-right'" aria-hidden="true"></i>
-        {{ kpi.delta }}
-        <span class="kpi-from">from last week</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================
-       VISTA RÁPIDA
-  ========================== -->
-  <section class="quick-view-row">
-    <a class="quick-card" *ngFor="let q of quickViewCards" [routerLink]="q.routerLink">
-      <div class="quick-top">
-        <div class="quick-icon" [style.background]="q.color + '1a'" [style.color]="q.color">
-          <i [ngClass]="q.icon" aria-hidden="true"></i>
-        </div>
-        <strong class="quick-title">{{ q.title }}</strong>
-        <i class="ti ti-chevron-right quick-arrow" aria-hidden="true"></i>
-      </div>
-      <div class="quick-stats">
-        <div class="quick-stat" *ngFor="let s of q.stats">
-          <span class="quick-stat-value">{{ s.value }}</span>
-          <span class="quick-stat-label">{{ s.label }}</span>
-        </div>
-      </div>
-    </a>
-  </section>
-
-  <!-- ==========================
-       MAIN GRID
-  ========================== -->
-  <section class="main-grid">
-
-    <!-- LEFT COLUMN -->
-    <div class="col-left">
-
-      <!-- GUESTS -->
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Guests</h3>
-          <span class="panel-tag">This Week</span>
-        </div>
-        <div class="chart guests-chart">
-          <svg viewBox="0 0 320 160" preserveAspectRatio="none" class="line-svg">
-            <defs>
-              <linearGradient id="gFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25" />
-                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
-              </linearGradient>
-            </defs>
-            <polyline class="line-area"
-              [attr.points]="getLinePoints()"
-              fill="url(#gFill)" stroke="none" />
-            <polyline class="line-stroke"
-              [attr.points]="getLinePoints()"
-              fill="none" stroke="#3b82f6" stroke-width="2.5" />
-            <g class="dots">
-              <circle *ngFor="let p of getDots()"
-                [attr.cx]="p.x" [attr.cy]="p.y" r="3.5"
-                fill="#ffffff" stroke="#3b82f6" stroke-width="2" />
-            </g>
-          </svg>
-          <div class="chart-axis">
-            <span *ngFor="let g of guestsByDay">{{ g.day }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- BOOKINGS BAR CHART -->
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Bookings</h3>
-          <span class="panel-tag">This Year</span>
-        </div>
-        <div class="bar-chart">
-          <div class="bar" *ngFor="let b of monthlyBookings">
-            <div class="bar-stack" [style.height.%]="b.bookedPct">
-              <span class="bar-value">{{ b.booked }}</span>
-            </div>
-            <div class="bar-stack cancelled" [style.height.%]="b.cancelledPct">
-              <span class="bar-value light">{{ b.cancelled }}</span>
-            </div>
-            <div class="bar-label">{{ b.month }}</div>
-          </div>
-        </div>
-        <div class="bar-legend">
-          <span><i class="dot booked"></i> Booked</span>
-          <span><i class="dot cancelled"></i> Canceled</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT COLUMN -->
-    <div class="col-right">
-
-      <!-- ROOM OCCUPANCY -->
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Room Occupancy</h3>
-          <i class="ti ti-dots-vertical" aria-hidden="true"></i>
-        </div>
-        <div class="occupancy-num">
-          <i class="ti ti-building" aria-hidden="true"></i>
-          <span class="big">{{ ocupacion.total }}</span>
-          <span class="muted">Total Rooms</span>
-        </div>
-        <div class="occupancy-bar">
-          <div class="occ-fill" [style.width.%]="ocupacion.porcentaje"></div>
-        </div>
-        <div class="occupancy-legend">
-          <div><i class="dot occ"></i> {{ habitacionesOcupadas }} Occupied</div>
-          <div><i class="dot ava"></i> {{ habitacionesDisponibles }} Available</div>
-        </div>
-      </div>
-
-      <!-- OVERALL RATINGS -->
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Overall Ratings</h3>
-          <a class="see-all">See All</a>
-        </div>
-        <div class="rating-summary">
-          <div class="rating-score">
-            <span class="big">8.9</span>
-            <div>
-              <strong>Excellent</strong>
-              <small>5,827 verified reviews</small>
-            </div>
-          </div>
-        </div>
-        <div class="rating-row" *ngFor="let r of ratingRows">
-          <span class="r-label">{{ r.label }}</span>
-          <div class="r-bar">
-            <div class="r-fill" [style.width.%]="r.value * 10"></div>
-          </div>
-          <span class="r-value">{{ r.value.toFixed(1) }}</span>
-        </div>
-      </div>
-
-      <!-- RECENT ACTIVITY -->
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Recent Activity</h3>
-          <a class="see-all">See All</a>
-        </div>
-        <div class="activity-list" *ngIf="recentActivity.length > 0; else noActivity">
-          <div class="activity" *ngFor="let a of recentActivity">
-            <div class="act-icon" [style.background]="a.color + '22'" [style.color]="a.color">
-              <i class="ti" [ngClass]="a.icon" aria-hidden="true"></i>
-            </div>
-            <div class="act-body">
-              <strong>{{ a.title }}</strong>
-              <p>{{ a.description }}</p>
-              <small>{{ a.time }}</small>
-            </div>
-          </div>
-        </div>
-        <ng-template #noActivity>
-          <div class="empty">Sin actividad reciente.</div>
-        </ng-template>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================
-       BOOKING LIST
-  ========================== -->
-  <section class="panel booking-list-panel">
-    <div class="panel-head">
-      <h3>Booking List</h3>
-      <div class="panel-actions">
-        <span class="panel-tag">Today</span>
-        <a class="see-all">See All</a>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table class="booking-table">
-        <thead>
-          <tr>
-            <th>Booking ID</th>
-            <th>Guest Name</th>
-            <th>Room Type</th>
-            <th>Room No</th>
-            <th>Duration</th>
-            <th>Check-In</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of ultReservas">
-            <td><strong>#{{ r.id.toString().padStart(4, '0') }}</strong></td>
-            <td>{{ r.cliente }}</td>
-            <td>{{ tipoHabitacion(r.habitacion) }}</td>
-            <td>{{ r.habitacion }}</td>
-            <td>{{ duracion(r.checkin, r.checkout) }}</td>
-            <td>{{ r.checkin | date:'mediumDate' }}</td>
-            <td>
-              <span class="status-pill" [ngClass]="r.estado">
-                {{ r.estado | titlecase }}
-              </span>
-            </td>
-          </tr>
-          <tr *ngIf="ultReservas.length === 0">
-            <td colspan="7" class="empty">No hay reservas registradas.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-</ng-container>
