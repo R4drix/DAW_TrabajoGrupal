@@ -40,6 +40,17 @@ export interface Camara {
   icon_class: string;
 }
 
+/**
+ * TODO(backend): el modelo Camara aún no tiene un campo de ocupación
+ * ni un endpoint que lo exponga. Esta interfaz extiende Camara con el
+ * campo que vamos a necesitar (`esta_ocupada`) para que, cuando exista
+ * el endpoint real, solo haya que apuntar ApiService ahí y borrar el
+ * mock en AdminSaunas.
+ */
+export interface CamaraEstado extends Camara {
+  esta_ocupada: boolean;
+}
+
 export interface Reserva {
   id: number;
   cliente: string;

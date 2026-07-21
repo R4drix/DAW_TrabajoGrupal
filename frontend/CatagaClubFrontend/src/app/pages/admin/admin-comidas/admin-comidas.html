@@ -1,7 +1,75 @@
-<div class="placeholder">
-  <div class="placeholder-icon">
-    <i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Comidas</h1>
+    <p class="page-sub">Vista general de pedidos e ingresos del restaurante</p>
   </div>
-  <h1>Comidas</h1>
-  <p>Consumos y menú del restaurante. Próximamente.</p>
 </div>
+
+<div *ngIf="loading()" class="state-box">Cargando información del restaurant...</div>
+<div *ngIf="errorMsg()" class="state-box error">{{ errorMsg() }}</div>
+
+<ng-container *ngIf="!loading() && !errorMsg()">
+
+  <!-- KPI ROW -->
+  <section class="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-title">Ingresos Hoy</span>
+      <div class="kpi-value">S/ {{ ingresosHoy().toFixed(2) }}</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-title">Pedidos Hoy</span>
+      <div class="kpi-value">{{ pedidosHoy() }}</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-title">Ticket Promedio</span>
+      <div class="kpi-value">S/ {{ ticketPromedio().toFixed(2) }}</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-title">Platos Vendidos</span>
+      <div class="kpi-value">{{ platosVendidos() }}</div>
+    </div>
+  </section>
+
+  <section class="main-grid">
+
+    <!-- PLATOS TOP -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Platos más pedidos</h3>
+        <span class="panel-tag">Hoy</span>
+      </div>
+      <div class="plato-row" *ngFor="let p of platosTop()">
+        <span class="p-label">{{ p.plato }}</span>
+        <div class="p-bar">
+          <div class="p-fill" [style.width.%]="p.pct"></div>
+        </div>
+        <span class="p-value">{{ p.cantidad }}</span>
+      </div>
+      <div class="empty" *ngIf="platosTop().length === 0">Sin pedidos registrados hoy.</div>
+    </div>
+
+    <!-- PEDIDOS RECIENTES -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Pedidos recientes</h3>
+        <span class="panel-tag">Últimos {{ pedidosRecientes().length }}</span>
+      </div>
+      <div class="orders-list" *ngIf="pedidosRecientes().length > 0; else noPedidos">
+        <div class="order-row" *ngFor="let c of pedidosRecientes()">
+          <div class="order-icon"><i class="ti ti-tools-kitchen-2" aria-hidden="true"></i></div>
+          <div class="order-body">
+            <strong>{{ c.plato }}</strong>
+            <p>{{ c.cliente }} · x{{ c.cantidad }}</p>
+            <small>{{ c.fecha | date:'short' }}</small>
+          </div>
+          <div class="order-amount">S/ {{ c.subtotal.toFixed(2) }}</div>
+        </div>
+      </div>
+      <ng-template #noPedidos>
+        <div class="empty">No hay pedidos registrados.</div>
+      </ng-template>
+    </div>
+
+  </section>
+
+</ng-container>

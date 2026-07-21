@@ -1,8 +1,18 @@
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { ApiService } from '../../../services/api.service';
-import { Dashboard, Habitacion, Reserva, Consumo } from '../../../services/models';
+import { Dashboard, Habitacion, Reserva, Consumo, CamaraEstado } from '../../../services/models';
+import { MOCK_SAUNAS } from '../../../services/mocks/saunas.mock';
+
+interface QuickViewCard {
+  title: string;
+  icon: string;
+  color: string;
+  routerLink: string;
+  stats: { label: string; value: string }[];
+}
 
 interface KpiCard {
   title: string;
@@ -27,7 +37,7 @@ interface RatingRow { label: string; value: number; }
 @Component({
   selector: 'app-admin-home',
   standalone: true,
-  imports: [CommonModule, DatePipe, TitleCasePipe],
+  imports: [CommonModule, DatePipe, TitleCasePipe, RouterLink],
   templateUrl: './admin-home.html',
   styleUrl: './admin-home.css',
 })
@@ -42,7 +52,12 @@ export class AdminHome implements OnInit {
   reservas: Reserva[] = [];
   consumos: Consumo[] = [];
 
+  // MOCK — ver services/mocks/saunas.mock.ts. Reemplazar por datos reales
+  // cuando exista un endpoint de saunas en el backend.
+  saunas: CamaraEstado[] = MOCK_SAUNAS;
+
   kpis: KpiCard[] = [];
+  quickViewCards: QuickViewCard[] = [];
   recentActivity: RecentActivity[] = [];
   monthlyBookings: MonthlyBar[] = [];
   ratingRows: RatingRow[] = [
@@ -75,6 +90,7 @@ export class AdminHome implements OnInit {
         this.buildKpis();
         this.buildActivity();
         this.buildMonthlyBookings();
+        this.buildQuickView();
         this.loading.set(false);
       }
     };
@@ -152,6 +168,79 @@ export class AdminHome implements OnInit {
 
   get habitacionesDisponibles(): number {
     return this.habitaciones.filter((h) => !h.esta_ocupada).length;
+  }
+
+  get saunasOcupadas(): number {
+    return this.saunas.filter((s) => s.esta_ocupada).length;
+  }
+
+  get saunasLibres(): number {
+    return this.saunas.length - this.saunasOcupadas;
+  }
+
+  get platoTopHoy(): string {
+    if (this.consumos.length === 0) return '—';
+    const conteo = new Map<string, number>();
+    this.consumos.forEach((c) => {
+      conteo.set(c.plato, (conteo.get(c.plato) ?? 0) + (c.cantidad || 0));
+    });
+    const top = [...conteo.entries()].sort((a, b) => b[1] - a[1])[0];
+    return top ? top[0] : '—';
+  }
+
+  /**
+   * Arma las 4 tarjetas de "vista rápida" (Habitaciones, Comidas, Saunas,
+   * Clientes) que se muestran arriba del dashboard, cada una con sus
+   * métricas clave y un link a la vista completa correspondiente.
+   */
+  private buildQuickView(): void {
+    const d = this.data;
+
+    this.quickViewCards = [
+      {
+        title: 'Habitaciones',
+        icon: 'ti ti-bed',
+        color: '#3b82f6',
+        routerLink: '/admin/rooms',
+        stats: [
+          { label: 'Ocupadas', value: String(this.habitacionesOcupadas) },
+          { label: 'Disponibles', value: String(this.habitacionesDisponibles) },
+          { label: 'Ocupación', value: `${this.ocupacion.porcentaje}%` },
+        ],
+      },
+      {
+        title: 'Comidas',
+        icon: 'ti ti-tools-kitchen-2',
+        color: '#10b981',
+        routerLink: '/admin/comidas',
+        stats: [
+          { label: 'Ingresos hoy', value: `S/ ${(d?.ingresos_restaurante_hoy ?? 0).toFixed(2)}` },
+          { label: 'Pedidos hoy', value: String(d?.consumos_hoy ?? this.consumos.length) },
+          { label: 'Plato top', value: this.platoTopHoy },
+        ],
+      },
+      {
+        title: 'Saunas',
+        icon: 'ti ti-flame',
+        color: '#f59e0b',
+        routerLink: '/admin/sauna',
+        stats: [
+          { label: 'Ocupadas', value: String(this.saunasOcupadas) },
+          { label: 'Libres', value: String(this.saunasLibres) },
+          { label: 'Total', value: String(this.saunas.length) },
+        ],
+      },
+      {
+        title: 'Clientes',
+        icon: 'ti ti-users',
+        color: '#8b5cf6',
+        routerLink: '/admin/reservas',
+        stats: [
+          { label: 'Registrados', value: String(d?.clientes ?? 0) },
+          { label: 'Reservas activas', value: String(d?.reservas_activas ?? 0) },
+        ],
+      },
+    ];
   }
 
   private buildActivity(): void {

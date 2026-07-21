@@ -33,6 +33,27 @@
   </section>
 
   <!-- ==========================
+       VISTA RÁPIDA
+  ========================== -->
+  <section class="quick-view-row">
+    <a class="quick-card" *ngFor="let q of quickViewCards" [routerLink]="q.routerLink">
+      <div class="quick-top">
+        <div class="quick-icon" [style.background]="q.color + '1a'" [style.color]="q.color">
+          <i [ngClass]="q.icon" aria-hidden="true"></i>
+        </div>
+        <strong class="quick-title">{{ q.title }}</strong>
+        <i class="ti ti-chevron-right quick-arrow" aria-hidden="true"></i>
+      </div>
+      <div class="quick-stats">
+        <div class="quick-stat" *ngFor="let s of q.stats">
+          <span class="quick-stat-value">{{ s.value }}</span>
+          <span class="quick-stat-label">{{ s.label }}</span>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <!-- ==========================
        MAIN GRID
   ========================== -->
   <section class="main-grid">

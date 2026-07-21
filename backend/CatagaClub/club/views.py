@@ -317,18 +317,15 @@ def api_reservas(request):
     
 @require_GET
 def api_consumos(request):
-    data = []
-    for c in ConsumoRestaurante.objects.select_related('cliente').all()[:200]:
-        data.append({
-            'id':       c.id,
-            'cliente':  c.cliente.nombre,
-            'plato':    c.descripcion_plato,
-            'precio':   float(c.precio),
-            'cantidad': c.cantidad,
-            'subtotal': float(c.subtotal),
-            'fecha':    c.fecha.isoformat(),
-        })
-    return JsonResponse({'ok': True, 'count': len(data), 'consumos': data}, safe=False)
+    # PARCHE: el modelo ConsumoRestaurante fue eliminado en la migración
+    # 0002_plato_delete_consumorestaurante y reemplazado por Plato (solo
+    # catálogo de menú, sin registro de pedidos individuales). Por ahora
+    # no hay de dónde sacar consumos reales, así que devolvemos vacío en
+    # vez de romper con un NameError.
+    # TODO: si se recrea un modelo de pedidos (ej. ConsumoRestaurante o
+    # Pedido con FK a Cliente y Plato), reemplazar este bloque por la
+    # consulta real.
+    return JsonResponse({'ok': True, 'count': 0, 'consumos': []}, safe=False)
 
 
 @require_GET
@@ -336,9 +333,12 @@ def api_dashboard(request):
     hoy = timezone.now().date()
     reservas_activas     = Reserva.objects.filter(estado='activa').count()
     habitaciones_ocupadas = Habitacion.objects.filter(esta_ocupada=True).count()
-    ingresos_hoy = ConsumoRestaurante.objects.filter(
-        fecha__date=hoy
-    ).aggregate(total=Sum('precio'))['total'] or Decimal('0.00')
+
+    # PARCHE: ver nota en api_consumos — ConsumoRestaurante ya no existe,
+    # así que estos dos valores quedan en 0 hasta que exista un modelo
+    # real de pedidos.
+    ingresos_hoy = Decimal('0.00')
+    consumos_hoy = 0
 
     return JsonResponse({
         'ok':                       True,
@@ -347,7 +347,7 @@ def api_dashboard(request):
         'habitaciones_ocupadas':    habitaciones_ocupadas,
         'reservas_activas':         reservas_activas,
         'ingresos_restaurante_hoy': float(ingresos_hoy),
-        'consumos_hoy':             ConsumoRestaurante.objects.filter(fecha__date=hoy).count(),
+        'consumos_hoy':             consumos_hoy,
     }, safe=False)
 
 
