@@ -1,7 +1,47 @@
-<div class="placeholder">
-  <div class="placeholder-icon">
-    <i class="ti ti-flame" aria-hidden="true"></i>
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Saunas</h1>
+    <p class="page-sub">Vista general de ocupación de las saunas</p>
   </div>
-  <h1>Sauna</h1>
-  <p>Gestión de turnos y servicios de sauna. Próximamente.</p>
+  <span class="mock-tag" title="El backend aún no expone el estado real de las saunas">
+    <i class="ti ti-alert-triangle" aria-hidden="true"></i> Datos de ejemplo
+  </span>
 </div>
+
+<!-- KPI ROW -->
+<section class="kpi-row">
+  <div class="kpi-card">
+    <span class="kpi-title">Total Saunas</span>
+    <div class="kpi-value">{{ total() }}</div>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-title">Ocupadas</span>
+    <div class="kpi-value occ">{{ ocupadas() }}</div>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-title">Libres</span>
+    <div class="kpi-value ava">{{ libres() }}</div>
+  </div>
+</section>
+
+<!-- GRID DE SAUNAS -->
+<section class="sauna-grid">
+  <div class="sauna-card" *ngFor="let s of saunas()">
+    <div class="sauna-top">
+      <div class="sauna-icon" [class.occ]="s.esta_ocupada" [class.ava]="!s.esta_ocupada">
+        <i [ngClass]="s.icon_class" aria-hidden="true"></i>
+      </div>
+      <span class="status-pill" [class.occ]="s.esta_ocupada" [class.ava]="!s.esta_ocupada">
+        {{ s.esta_ocupada ? 'Ocupada' : 'Libre' }}
+      </span>
+    </div>
+    <strong class="sauna-tipo">{{ s.tipo }}</strong>
+    <p class="sauna-desc">{{ s.descripcion }}</p>
+    <div class="sauna-meta">
+      <i class="ti ti-users" aria-hidden="true"></i> {{ s.capacidad }} personas
+    </div>
+    <button class="toggle-btn" (click)="toggleEstado(s.id)">
+      Marcar como {{ s.esta_ocupada ? 'libre' : 'ocupada' }}
+    </button>
+  </div>
+</section>
