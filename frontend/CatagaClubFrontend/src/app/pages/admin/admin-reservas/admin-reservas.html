@@ -1,7 +1,169 @@
-<div class="placeholder">
-  <div class="placeholder-icon">
-    <i class="ti ti-calendar-event" aria-hidden="true"></i>
+<!-- CABECERA DE PÁGINA -->
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Reservas del Hotel</h1>
+    <p class="page-sub">Consulta qué usuarios han reservado, sus datos de contacto y el estado del hospedaje</p>
   </div>
-  <h1>Reservas</h1>
-  <p>Gestión de reservas del Cátaga Club. Próximamente.</p>
+</div>
+
+<!-- MENSAJES DE ESTADO -->
+<div *ngIf="loading()" class="state-box">Cargando lista de reservaciones...</div>
+<div *ngIf="errorMsg()" class="state-box error">{{ errorMsg() }}</div>
+
+<!-- TABLA PRINCIPAL DE RESERVAS -->
+<div class="panel" *ngIf="!loading()">
+  <div class="panel-head">
+    <h3>Reservaciones Registradas</h3>
+    <span class="panel-tag">{{ reservas().length }} en total</span>
+  </div>
+
+  <div class="table-wrap">
+    <table class="meals-table">
+      <thead>
+        <tr>
+          <th>Código / ID</th>
+          <th>Cliente (Quién separa)</th>
+          <th>Habitación</th>
+          <th>Personas</th>
+          <th>Fechas (Llegada - Salida)</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let res of reservas()">
+          <td>
+            <strong>#{{ res.codigo || res.id }}</strong>
+          </td>
+          <td>
+            <div class="client-info">
+              <strong><i class="ti ti-user"></i> {{ res.cliente_nombre }}</strong>
+              <small class="desc-text"><i class="ti ti-mail"></i> {{ res.cliente_correo }}</small>
+              <small class="desc-text"><i class="ti ti-phone"></i> {{ res.cliente_telefono }}</small>
+            </div>
+          </td>
+          <td>
+            <span class="room-tag">Hab. {{ res.habitacion_numero }}</span>
+            <p class="desc-text">{{ res.habitacion_tipo }}</p>
+          </td>
+          <td>
+            <span class="badge-people"><i class="ti ti-users"></i> {{ res.num_personas }} pers.</span>
+          </td>
+          <td>
+            <div><i class="ti ti-calendar"></i> {{ res.fecha_inicio }}</div>
+            <small class="desc-text">hasta {{ res.fecha_fin }}</small>
+          </td>
+          <td class="price-cell">S/ {{ res.total }}</td>
+          <td>
+            <span class="status-pill" [ngClass]="getEstadoBadgeClass(res.estado)">
+              {{ res.estado | titlecase }}
+            </span>
+          </td>
+          <td class="text-right actions-cell">
+            <!-- Ver / Editar en Modal -->
+            <button class="btn-action" (click)="verDetalles(res)" title="Ver / Editar Estado">
+              <i class="ti ti-eye"></i> Detalle
+            </button>
+
+            <!-- Ver Comprobante PDF -->
+            <button class="btn-action btn-pdf" (click)="imprimirComprobante(res.id)" title="Ver PDF">
+              <i class="ti ti-file-text"></i> PDF
+            </button>
+
+            <!-- Cancelar Reserva Directamente -->
+            <button 
+              *ngIf="res.estado !== 'cancelada'" 
+              class="btn-action btn-cancel" 
+              (click)="cancelarReserva(res.id)" 
+              title="Marcar como Cancelada">
+              <i class="ti ti-ban"></i> Cancelar
+            </button>
+
+            <!-- Eliminar Reserva Definitivamente de BD -->
+            <button 
+              class="btn-action btn-delete" 
+              (click)="eliminarReserva(res.id)" 
+              title="Eliminar de la Base de Datos">
+              <i class="ti ti-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="reservas().length === 0">
+          <td colspan="8" class="empty">Aún no hay reservas registradas desde la web o el sistema.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL DE DETALLES Y EDICIÓN DE ESTADO -->
+<div class="modal-overlay" *ngIf="isModalOpen()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3 class="modal-title">Detalles de Reserva #{{ selectedReserva()?.codigo || selectedReserva()?.id }}</h3>
+        <p class="modal-sub">Información ingresada por el usuario al reservar</p>
+      </div>
+      <button type="button" class="btn-close" (click)="cerrarModal()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <!-- FICHA DE ESPECIFICACIONES -->
+    <div class="modal-body">
+      <div class="details-grid" *ngIf="selectedReserva() as res">
+        <div class="detail-box">
+          <label>Cliente que Reservó</label>
+          <p><strong>{{ res.cliente_nombre }}</strong></p>
+          <p class="sub-detail">Correo: {{ res.cliente_correo }}</p>
+          <p class="sub-detail">Teléfono: {{ res.cliente_telefono }}</p>
+        </div>
+
+        <div class="detail-box">
+          <label>Habitación Separada</label>
+          <p><strong>Habitación Nº {{ res.habitacion_numero }}</strong></p>
+          <p class="sub-detail">Tipo: {{ res.habitacion_tipo }}</p>
+          <p class="sub-detail">Aforo: {{ res.num_personas }} Persona(s)</p>
+        </div>
+
+        <div class="detail-box full-width">
+          <label>Fechas de Hospedaje</label>
+          <p>Entrada: <strong>{{ res.fecha_inicio }}</strong> — Salida: <strong>{{ res.fecha_fin }}</strong></p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- FORMULARIO DE CAMBIO DE ESTADO -->
+      <form [formGroup]="reservaForm" (ngSubmit)="guardarCambios()" class="form-grid">
+        <div class="form-group">
+          <label>Estado de Reserva</label>
+          <select formControlName="estado">
+            <option value="pendiente">Pendiente (Por llegar)</option>
+            <option value="en_uso">En Uso (Hospedado)</option>
+            <option value="finalizado">Finalizado (Completado)</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Total de la Reserva (S/)</label>
+          <input type="number" step="0.01" formControlName="total">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Notas de Administración</label>
+          <textarea formControlName="notas" rows="2" placeholder="Observaciones de pago, adelantos, etc."></textarea>
+        </div>
+
+        <div class="modal-footer full-width">
+          <button type="button" class="btn-secondary" (click)="cerrarModal()">Cerrar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Actualizar Reserva' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

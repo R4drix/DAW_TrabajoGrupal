@@ -130,7 +130,6 @@ export class AdminComidas implements OnInit {
     });
   }
 
-  // Devuelve la etiqueta amigable para mostrar en la tabla (ej. 'bebidas_calientes' -> 'Bebidas Calientes')
   getCategoriaLabel(key: string): string {
     const cat = this.categorias.find((c) => c.value === key);
     return cat ? cat.label : key;

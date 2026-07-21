@@ -193,44 +193,54 @@ export class ReservarWizard {
   actualizarCorreo(event: Event): void { this.correoCliente.set((event.target as HTMLInputElement).value); }
   actualizarTelefono(event: Event): void { this.telefonoCliente.set((event.target as HTMLInputElement).value); }
 
+// Función helper para formatear Date a "YYYY-MM-DD" local sin desfase UTC
+private formatearFechaISO(fecha: Date | null): string {
+  if (!fecha) return '';
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+}
+
 confirmarReserva(): void {
-    if (!this.datosCompletos() || !this.habitacionSeleccionada()) return;
+  if (!this.datosCompletos() || !this.habitacionSeleccionada()) return;
 
-    const payloadReserva = {
-      habitacion_numero: this.habitacionSeleccionada()?.numero,
-      fecha_llegada: this.fechaLlegada()?.toISOString().split('T')[0],
-      fecha_salida: this.fechaSalida()?.toISOString().split('T')[0],
-      nombre_cliente: this.nombreCliente(),
-      correo_cliente: this.correoCliente(),
-      telefono_cliente: this.telefonoCliente(),
-      total_pago: this.total(),
-      cantidad_personas: this.personas()
-    };
+  // Formateamos las fechas sin que la conversión UTC reste un día
+  const fechaLlegadaStr = this.formatearFechaISO(this.fechaLlegada());
+  const fechaSalidaStr = this.formatearFechaISO(this.fechaSalida());
 
-    this.apiService.crearReserva(payloadReserva).subscribe({
-      next: (response: any) => {
-        console.log('Reserva guardada con éxito:', response);
-        
-        // CORRECCIÓN: Leemos 'codigo' que es la llave exacta que configuramos en Django
-        const codigoFinal = response.codigo || this.generarCodigoReserva();
-        
-        this.codigoReserva.set(codigoFinal);
-        this.reservaConfirmada.set(true);
+  const payloadReserva = {
+    habitacion_numero: this.habitacionSeleccionada()?.numero,
+    fecha_llegada: fechaLlegadaStr,
+    fecha_salida: fechaSalidaStr,
+    nombre_cliente: this.nombreCliente(),
+    correo_cliente: this.correoCliente(),
+    telefono_cliente: this.telefonoCliente(),
+    total_pago: this.total(),
+    cantidad_personas: this.personas()
+  };
 
-        // EXTRA: Gatilla la descarga automática del PDF al confirmar la reserva con éxito
-        this.generarFacturaPDF();
-      },
-      error: (err) => {
-        console.error('Error al guardar la reserva:', err);
-        
-        // Salvavidas para el Laboratorio: Si falla la red/servidor, simula éxito para poder imprimir
-        const codigoSimulado = this.generarCodigoReserva();
-        this.codigoReserva.set(codigoSimulado);
-        this.reservaConfirmada.set(true);
-        this.generarFacturaPDF();
-      }
-    });
-  }
+  this.apiService.crearReserva(payloadReserva).subscribe({
+    next: (response: any) => {
+      console.log('Reserva guardada con éxito:', response);
+      
+      const codigoFinal = response.codigo || this.generarCodigoReserva();
+      
+      this.codigoReserva.set(codigoFinal);
+      this.reservaConfirmada.set(true);
+
+      this.generarFacturaPDF();
+    },
+    error: (err: any) => {
+      console.error('Error al guardar la reserva:', err);
+      
+      const codigoSimulado = this.generarCodigoReserva();
+      this.codigoReserva.set(codigoSimulado);
+      this.reservaConfirmada.set(true);
+      this.generarFacturaPDF();
+    }
+  });
+}
 
   nuevaReserva(): void {
     this.pasoActual.set(0);

@@ -64,4 +64,16 @@ export class ApiService {
       datos
     );
   }
+
+
+
+  // Cancelar o actualizar estado
+  actualizarReserva(id: number, datos: { estado?: string; total?: number; notas?: string }): Observable<any> {
+    return this.http.patch<any>(`${this.baseUrl}/reservas/${id}/`, datos);
+  }
+
+  // Eliminar definitivamente
+  eliminarReserva(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/reservas/${id}/`);
+  }
 }

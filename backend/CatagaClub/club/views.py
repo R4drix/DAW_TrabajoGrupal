@@ -17,6 +17,17 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import (ClienteForm, HabitacionForm,
                     ReservaForm)
 from .models import Cliente, Habitacion, Reserva, Plato, Camara
+from datetime import datetime
+from django.http import JsonResponse
+from django.db.models import Q
+from .models import Habitacion, Reserva
+
+
+from datetime import date, datetime
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Reserva, Habitacion
 
 
 class PublicListMixin:
@@ -384,55 +395,106 @@ def home(request):
         'reservas_activas':    Reserva.objects.filter(estado='activa').count(),
     }
     return render(request, 'club/home.html', ctx)
-from datetime import datetime
-from django.db.models import Q
-from django.http import JsonResponse
-from .models import Habitacion, Reserva
 
+
+@csrf_exempt
 def habitaciones_disponibles_api(request):
+    if request.method != 'GET':
+        return JsonResponse({'ok': False, 'error': 'Método no permitido'}, status=405)
+
     try:
-        llegada_str = request.GET.get('llegada')
-        salida_str = request.GET.get('salida')
+        # 1. Obtener parámetros GET
+        personas_str = request.GET.get('personas', '1')
+        str_llegada = request.GET.get('llegada', '').strip()
+        str_salida = request.GET.get('salida', '').strip()
 
-        # 1. Traemos ABSOLUTAMENTE TODAS las habitaciones de tu base de datos
-        # Sin filtros de capacidad para que todas las pestañas (Simple, Doble, etc.) tengan datos
-        habitaciones = Habitacion.objects.all()
+        try:
+            num_personas = int(personas_str)
+        except (ValueError, TypeError):
+            num_personas = 1
 
-        # 2. Identificar cuáles están reservadas en estas fechas
-        ocupadas_ids = set()
-        if llegada_str and salida_str:
+        if not str_llegada or not str_salida:
+            return JsonResponse({'ok': False, 'error': 'Debe proporcionar fecha de llegada y salida'}, status=400)
+
+        # 2. Conversión segura de fechas (Usando directamente datetime.strptime)
+        fecha_llegada = datetime.strptime(str_llegada, '%Y-%m-%d').date()
+        fecha_salida = datetime.strptime(str_salida, '%Y-%m-%d').date()
+
+        if fecha_salida <= fecha_llegada:
+            return JsonResponse({'ok': False, 'error': 'La fecha de salida debe ser posterior a la de llegada'}, status=400)
+
+        # 3. Filtrar reservas que se cruzan con el rango solicitado
+        # Búsqueda flexible de campos en el modelo Reserva (fecha_checkin/checkout o fecha_inicio/fin)
+        reservas_base = Reserva.objects.exclude(estado='cancelada')
+
+        try:
+            # Intento 1: Nombres estándar de tu modelo (fecha_checkin / fecha_checkout)
+            reservas_conflictivas = reservas_base.filter(
+                fecha_checkin__lt=fecha_salida,
+                fecha_checkout__gt=fecha_llegada
+            )
+        except Exception:
             try:
-                llegada_date = datetime.strptime(llegada_str, "%Y-%m-%d").date()
-                salida_date = datetime.strptime(salida_str, "%Y-%m-%d").date()
+                # Intento 2: Nombres alternativos (fecha_inicio / fecha_fin)
+                reservas_conflictivas = reservas_base.filter(
+                    fecha_inicio__lt=fecha_salida,
+                    fecha_fin__gt=fecha_llegada
+                )
+            except Exception:
+                # Intento 3: Nombres alternativos (fecha_llegada / fecha_salida)
+                reservas_conflictivas = reservas_base.filter(
+                    fecha_llegada__lt=fecha_salida,
+                    fecha_salida__gt=fecha_llegada
+                )
 
-                ocupadas_ids = set(Reserva.objects.filter(
-                    estado='activa'
-                ).filter(
-                    Q(fecha_checkin__lt=salida_date) & Q(fecha_checkout__gt=llegada_date)
-                ).values_list('habitacion_id', flat=True))
-            except ValueError:
-                pass
+        # Identificar IDs de habitaciones ocupadas
+        hab_ids_ocupadas = set()
+        for res in reservas_conflictivas:
+            hab_id = getattr(res, 'habitacion_id', None)
+            if not hab_id and getattr(res, 'habitacion', None):
+                hab_id = res.habitacion.id
+            if hab_id:
+                hab_ids_ocupadas.add(hab_id)
 
-        # 3. Construimos el JSON enviando todo
+        # 4. Consultar habitaciones disponibles
+        habitaciones_qs = Habitacion.objects.all()
+
+        # Filtrado por capacidad/aforo si el campo existe en el modelo
+        if hasattr(Habitacion, 'capacidad'):
+            habitaciones_qs = habitaciones_qs.filter(capacidad__gte=num_personas)
+        elif hasattr(Habitacion, 'aforo'):
+            habitaciones_qs = habitaciones_qs.filter(aforo__gte=num_personas)
+
         data = []
-        for h in habitaciones:
-            data.append({
-                'id': h.id,
-                'numero': h.numero,
-                'tipo': h.tipo,
-                'precio_por_noche': float(h.precio_por_noche),
-                'capacidad': h.capacidad,
-                'imagen_principal': h.imagen_principal if h.imagen_principal else "https://via.placeholder.com/300",
-                'esta_ocupada': h.id in ocupadas_ids 
-            })
+        for hab in habitaciones_qs:
+            if hab.id not in hab_ids_ocupadas:
+                # Lectura de precio/tarifa
+                precio_val = float(getattr(hab, 'precio_por_noche', getattr(hab, 'precio', 0.0)))
 
-        return JsonResponse(data, safe=False)
+                # Obtención de imagen principal
+                img_attr = (
+                    getattr(hab, 'imagen_principal', None) or 
+                    getattr(hab, 'imagen', None)
+                )
+                imagen_url = str(img_attr) if img_attr else 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'
+
+                data.append({
+                    'id': hab.id,
+                    'numero': getattr(hab, 'numero', hab.id),
+                    'tipo': getattr(hab, 'tipo', 'Estándar'),
+                    'capacidad': getattr(hab, 'capacidad', num_personas),
+                    'precio': precio_val,
+                    'precio_por_noche': precio_val,
+                    'descripcion': getattr(hab, 'descripcion', 'Habitación confortable con todos los servicios.'),
+                    'imagen': imagen_url,
+                    'estado': 'disponible',
+                })
+
+        return JsonResponse(data, safe=False, status=200)
 
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-    
-
-
+        print("ERROR EN HABITACIONES DISPONIBLES API:", str(e))
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -569,3 +631,290 @@ def api_obtener_platos(request):
         for p in platos
     ]
     return JsonResponse(data, safe=False, status=200)
+from datetime import date
+import json
+from decimal import Decimal
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Reserva, Habitacion
+
+def calcular_estado_automatico(reserva):
+    """
+    Evalúa las fechas reales de la reserva contra la fecha actual (date.today())
+    y retorna el estado dinámico correspondiente.
+    """
+    # Si la reserva fue cancelada manualmente, mantenemos cancelada
+    if getattr(reserva, 'estado', '') == 'cancelada':
+        return 'cancelada'
+
+    hoy = date.today()
+
+    # Búsqueda de fechas de llegada y salida
+    llegada = (
+        getattr(reserva, 'fecha_inicio', None) or 
+        getattr(reserva, 'fecha_llegada', None) or 
+        getattr(reserva, 'check_in', None)
+    )
+    salida = (
+        getattr(reserva, 'fecha_fin', None) or 
+        getattr(reserva, 'fecha_salida', None) or 
+        getattr(reserva, 'check_out', None)
+    )
+
+    # Convertir a objetos date de python si vienen en formato string
+    if isinstance(llegada, str):
+        try: llegada = date.fromisoformat(llegada)
+        except ValueError: llegada = None
+        
+    if isinstance(salida, str):
+        try: salida = date.fromisoformat(salida)
+        except ValueError: salida = None
+
+    if not llegada or not salida:
+        return getattr(reserva, 'estado', 'pendiente')
+
+    # LÓGICA DE ESTADOS POR FECHA REAL:
+    if hoy < llegada:
+        return 'pendiente'       # Aún no llega el día de entrada
+    elif llegada <= hoy <= salida:
+        return 'en_uso'          # El cliente está actualmente hospedado
+    else: # hoy > salida
+        return 'finalizado'      # La fecha de estancia ya pasó
+
+@csrf_exempt
+def api_reservas(request, pk=None):
+
+    # ------------------------------------------------------------------
+    # 1. OBTENER RESERVAS (GET)
+    # ------------------------------------------------------------------
+    if request.method == 'GET':
+        try:
+            reservas = Reserva.objects.all().order_by('-id')
+            data = []
+            
+            for r in reservas:
+                cliente_obj = getattr(r, 'cliente', None)
+                if cliente_obj:
+                    nombre = f"{getattr(cliente_obj, 'nombres', '')} {getattr(cliente_obj, 'apellidos', '')}".strip()
+                    nombre = nombre or getattr(cliente_obj, 'nombre', 'Cliente Registrado')
+                    correo = getattr(cliente_obj, 'correo', getattr(cliente_obj, 'email', 'Sin correo'))
+                    telefono = getattr(cliente_obj, 'telefono', getattr(cliente_obj, 'celular', 'Sin teléfono'))
+                else:
+                    nombre = getattr(r, 'nombre_cliente', 'Cliente Web')
+                    correo = getattr(r, 'correo_cliente', 'Sin correo')
+                    telefono = getattr(r, 'telefono_cliente', 'Sin teléfono')
+
+                hab_obj = getattr(r, 'habitacion', None)
+                hab_numero = getattr(hab_obj, 'numero', getattr(r, 'habitacion_numero', 'N/A'))
+                hab_tipo = getattr(hab_obj, 'tipo', getattr(r, 'habitacion_tipo', 'Estándar'))
+
+                llegada = getattr(r, 'fecha_checkin', getattr(r, 'fecha_inicio', getattr(r, 'fecha_llegada', None)))
+                salida = getattr(r, 'fecha_checkout', getattr(r, 'fecha_fin', getattr(r, 'fecha_salida', None)))
+
+                str_llegada = llegada.strftime('%Y-%m-%d') if hasattr(llegada, 'strftime') else str(llegada or 'Sin fecha')
+                str_salida = salida.strftime('%Y-%m-%d') if hasattr(salida, 'strftime') else str(salida or 'Sin fecha')
+
+                estado_calculado = calcular_estado_automatico(r)
+
+                if hasattr(r, 'estado') and r.estado != estado_calculado and r.estado != 'cancelada':
+                    r.estado = estado_calculado
+                    r.save()
+
+                data.append({
+                    'id': r.id,
+                    'codigo': getattr(r, 'codigo', f"CTG-{r.id}"),
+                    'cliente_nombre': nombre,
+                    'cliente_correo': correo,
+                    'cliente_telefono': telefono,
+                    'habitacion_numero': hab_numero,
+                    'habitacion_tipo': hab_tipo,
+                    'fecha_inicio': str_llegada,
+                    'fecha_fin': str_salida,
+                    'num_personas': getattr(r, 'num_personas', getattr(r, 'cantidad_personas', 1)),
+                    'total': str(getattr(r, 'total', getattr(r, 'total_pago', getattr(r, 'total_acumulado', 0)))),
+                    'estado': estado_calculado,
+                    'notas': getattr(r, 'notas', ''),
+                })
+
+            return JsonResponse(data, safe=False, status=200)
+
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    # ------------------------------------------------------------------
+    # 2. CREAR RESERVA (POST)
+    # ------------------------------------------------------------------
+    elif request.method == 'POST':
+        try:
+            body = json.loads(request.body or '{}')
+
+            # Extraer datos recibidos desde el Wizard/Front-end
+            nombre = body.get('nombre_cliente', 'Cliente Web')
+            correo = body.get('correo_cliente', 'cliente@catagaclub.com').strip().lower()
+            telefono = str(body.get('telefono_cliente', '')).strip()
+            num_hab = body.get('habitacion_numero')
+            f_llegada = body.get('fecha_llegada') or body.get('fecha_checkin') or body.get('fecha_inicio')
+            f_salida = body.get('fecha_salida') or body.get('fecha_checkout') or body.get('fecha_fin')
+            total = body.get('total_pago') or body.get('total', 0)
+
+            # Buscar o registrar el Cliente en BD
+            cliente, _ = Cliente.objects.get_or_create(
+                email=correo,
+                defaults={'nombre': nombre, 'telefono': telefono}
+            )
+
+            # Buscar la habitación elegida
+            habitacion = None
+            if num_hab:
+                habitacion = Habitacion.objects.filter(numero=int(num_hab)).first()
+
+            # Calcular estado dinámico inicial
+            estado_inicial = evaluar_estado_por_fecha(f_llegada, f_salida)
+
+            # Guardar la Reserva en Supabase
+            reserva = Reserva.objects.create(
+                cliente=cliente,
+                habitacion=habitacion,
+                fecha_checkin=f_llegada,
+                fecha_checkout=f_salida,
+                estado=estado_inicial,
+                total_acumulado=Decimal(str(total)) if total else Decimal('0.00')
+            )
+
+            codigo_generado = f"CTG-{reserva.id}"
+
+            return JsonResponse({
+                'ok': True,
+                'mensaje': '¡Reserva creada exitosamente!',
+                'id': reserva.id,
+                'codigo': codigo_generado,
+                'datos_factura': {
+                    'nombre': nombre,
+                    'correo': correo,
+                    'habitacion': f"Habitación {num_hab}",
+                    'checkin': f_llegada,
+                    'checkout': f_salida,
+                    'total': str(total)
+                }
+            }, status=201)
+
+        except Exception as e:
+            print("ERROR AL CREAR RESERVA:", str(e))
+            return JsonResponse({'ok': False, 'error': f'Error al guardar la reserva: {str(e)}'}, status=500)
+
+    # ------------------------------------------------------------------
+    # 3. ACTUALIZAR / CANCELAR RESERVA (PATCH / PUT)
+    # ------------------------------------------------------------------
+    elif request.method in ['PATCH', 'PUT']:
+        if not pk:
+            return JsonResponse({'ok': False, 'error': 'ID de reserva no proporcionado'}, status=400)
+        try:
+            reserva = Reserva.objects.get(pk=pk)
+            body = json.loads(request.body or '{}')
+
+            if 'estado' in body and hasattr(reserva, 'estado'):
+                reserva.estado = body['estado']
+
+            if 'total' in body:
+                if hasattr(reserva, 'total'):
+                    reserva.total = Decimal(str(body['total']))
+                elif hasattr(reserva, 'total_pago'):
+                    reserva.total_pago = Decimal(str(body['total']))
+                elif hasattr(reserva, 'total_acumulado'):
+                    reserva.total_acumulado = Decimal(str(body['total']))
+
+            if 'notas' in body and hasattr(reserva, 'notas'):
+                reserva.notas = body['notas']
+
+            reserva.save()
+            return JsonResponse({'ok': True, 'mensaje': 'Reserva actualizada correctamente'}, status=200)
+
+        except Reserva.DoesNotExist:
+            return JsonResponse({'ok': False, 'error': 'Reserva no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    # ------------------------------------------------------------------
+    # 4. ELIMINAR RESERVA (DELETE)
+    # ------------------------------------------------------------------
+    elif request.method == 'DELETE':
+        if not pk:
+            return JsonResponse({'ok': False, 'error': 'ID de reserva no proporcionado'}, status=400)
+        try:
+            reserva = Reserva.objects.get(pk=pk)
+            reserva.delete()
+            return JsonResponse({'ok': True, 'mensaje': 'Reserva eliminada con éxito'}, status=200)
+
+        except Reserva.DoesNotExist:
+            return JsonResponse({'ok': False, 'error': 'Reserva no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def evaluar_estado_por_fecha(fecha_llegada_str, fecha_salida_str):
+    """
+    Determina si la reserva inicia hoy (en_uso), en el futuro (pendiente)
+    o ya venció (finalizado).
+    """
+    try:
+        hoy = date.today()
+        llegada = datetime.strptime(fecha_llegada_str, "%Y-%m-%d").date()
+        salida = datetime.strptime(fecha_salida_str, "%Y-%m-%d").date()
+
+        if hoy < llegada:
+            return 'pendiente'    # Es una reserva para días posteriores
+        elif llegada <= hoy <= salida:
+            return 'en_uso'       # Check-in activo HOY
+        else:
+            return 'finalizado'   # La fecha de checkout ya pasó
+    except Exception:
+        return 'pendiente'
+
+@csrf_exempt
+def api_crear_reserva(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            # 1. Extraer fechas que vienen del Wizard de Angular
+            f_llegada = data.get('fecha_llegada')
+            f_salida = data.get('fecha_salida')
+
+            # 2. Calcular estado dinámico automático
+            estado_inicial = evaluar_estado_por_fecha(f_llegada, f_salida)
+
+            # 3. Buscar Habitación por Número
+            num_hab = data.get('habitacion_numero')
+            habitacion = Habitacion.objects.filter(numero=num_hab).first()
+
+            # 4. Crear la reserva en BD
+            reserva = Reserva.objects.create(
+                habitacion=habitacion,
+                fecha_inicio=f_llegada,   # O fecha_checkin / fecha_llegada según tu model
+                fecha_fin=f_salida,       # O fecha_checkout / fecha_salida según tu model
+                nombre_cliente=data.get('nombre_cliente'),
+                correo_cliente=data.get('correo_cliente'),
+                telefono_cliente=data.get('telefono_cliente'),
+                total=data.get('total_pago'),
+                num_personas=data.get('cantidad_personas'),
+                estado=estado_inicial     # <--- NACE CON SU ESTADO REAL CALCULADO
+            )
+
+            # Generar un código único
+            codigo_generado = f"CTG-{reserva.id}"
+            if hasattr(reserva, 'codigo'):
+                reserva.codigo = codigo_generado
+                reserva.save()
+
+            return JsonResponse({
+                'ok': True,
+                'codigo': codigo_generado,
+                'id': reserva.id,
+                'estado': estado_inicial
+            }, status=201)
+
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
