@@ -1,47 +1,108 @@
-<div class="page-head">
-  <div>
-    <h1 class="page-title">Saunas</h1>
-    <p class="page-sub">Vista general de ocupación de las saunas</p>
-  </div>
-  <span class="mock-tag" title="El backend aún no expone el estado real de las saunas">
-    <i class="ti ti-alert-triangle" aria-hidden="true"></i> Datos de ejemplo
-  </span>
-</div>
+<div class="sauna-container">
+  <!-- Encabezado Principal -->
+  <header class="sauna-header">
+    <div class="header-titles">
+      <h1>Sauna</h1>
+      <p>Gestión y registro de ingresos al Sauna de Cátaga Club</p>
+    </div>
+  </header>
 
-<!-- KPI ROW -->
-<section class="kpi-row">
-  <div class="kpi-card">
-    <span class="kpi-title">Total Saunas</span>
-    <div class="kpi-value">{{ total() }}</div>
-  </div>
-  <div class="kpi-card">
-    <span class="kpi-title">Ocupadas</span>
-    <div class="kpi-value occ">{{ ocupadas() }}</div>
-  </div>
-  <div class="kpi-card">
-    <span class="kpi-title">Libres</span>
-    <div class="kpi-value ava">{{ libres() }}</div>
-  </div>
-</section>
-
-<!-- GRID DE SAUNAS -->
-<section class="sauna-grid">
-  <div class="sauna-card" *ngFor="let s of saunas()">
-    <div class="sauna-top">
-      <div class="sauna-icon" [class.occ]="s.esta_ocupada" [class.ava]="!s.esta_ocupada">
-        <i [ngClass]="s.icon_class" aria-hidden="true"></i>
+  <div class="sauna-content-grid">
+    <!-- Formulario -->
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <h2>Registrar Ingreso</h2>
       </div>
-      <span class="status-pill" [class.occ]="s.esta_ocupada" [class.ava]="!s.esta_ocupada">
-        {{ s.esta_ocupada ? 'Ocupada' : 'Libre' }}
-      </span>
+      <div class="card-body-custom">
+        <form (ngSubmit)="guardarIngreso()">
+          <div class="form-group">
+            <label>Titular / Pagador</label>
+            <input type="text" [(ngModel)]="nuevoRegistro.nombre_pagador" name="nombre" required placeholder="Nombre completo">
+          </div>
+
+          <div class="form-group">
+            <label>DNI</label>
+            <input type="text" [(ngModel)]="nuevoRegistro.dni_pagador" name="dni" required placeholder="N° Documento" maxlength="12">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col">
+              <label>Adultos (S/ 13)</label>
+              <input type="number" min="1" [(ngModel)]="nuevoRegistro.cant_adultos" name="cant_adultos">
+            </div>
+            <div class="form-group col">
+              <label>Niños (S/ 9)</label>
+              <input type="number" min="0" [(ngModel)]="nuevoRegistro.cant_ninos" name="cant_ninos">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Notas / Observaciones</label>
+            <input type="text" [(ngModel)]="nuevoRegistro.notas" name="notas" placeholder="Opcional">
+          </div>
+
+          <div class="total-box">
+            <span>Total a cobrar:</span>
+            <strong>S/ {{ totalCalculado | number:'1.2-2' }}</strong>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            Registrar Pago
+          </button>
+        </form>
+      </div>
     </div>
-    <strong class="sauna-tipo">{{ s.tipo }}</strong>
-    <p class="sauna-desc">{{ s.descripcion }}</p>
-    <div class="sauna-meta">
-      <i class="ti ti-users" aria-hidden="true"></i> {{ s.capacidad }} personas
+
+    <!-- Tabla de Registros -->
+    <div class="card-custom">
+      <div class="card-header-custom header-with-badge">
+        <h2>Lista de Ingresos</h2>
+        <span class="count-badge">{{ registros.length }} registrados</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="sauna-table">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>TITULAR</th>
+              <th>DNI</th>
+              <th>CANTIDAD</th>
+              <th>TOTAL</th>
+              <th>ESTADO</th>
+              <th>FECHA</th>
+              <th class="text-right">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of registros">
+              <td class="font-bold">#{{ item.id }}</td>
+              <td class="font-semibold">{{ item.nombre_pagador }}</td>
+              <td class="text-muted">{{ item.dni_pagador }}</td>
+              <td>
+                <span class="people-text">{{ item.cant_adultos }} ad. <ng-container *ngIf="item.cant_ninos > 0">/ {{ item.cant_ninos }} niñ.</ng-container></span>
+              </td>
+              <td class="font-bold">S/ {{ item.total_pagado }}</td>
+              <td>
+                <span class="badge-status">Pagado</span>
+              </td>
+              <td class="text-muted small-text">
+                {{ item.fecha_ingreso | date:'dd/MM/yyyy HH:mm':'America/Lima' }}
+              </td>
+              <td class="text-right">
+                <button type="button" class="btn-action-edit" (click)="eliminarRegistro(item.id!)">
+                   Eliminar
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="registros.length === 0">
+              <td colspan="8" class="empty-state">
+                No hay registros de ingreso al sauna hoy.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <button class="toggle-btn" (click)="toggleEstado(s.id)">
-      Marcar como {{ s.esta_ocupada ? 'libre' : 'ocupada' }}
-    </button>
   </div>
-</section>
+</div>

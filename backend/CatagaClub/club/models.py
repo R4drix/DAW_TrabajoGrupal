@@ -140,3 +140,24 @@ class Camara(models.Model):
 
     def __str__(self):
         return self.tipo
+    
+
+class RegistroSauna(models.Model):
+    nombre_pagador = models.CharField(max_length=150)
+    dni_pagador = models.CharField(max_length=15)
+    cant_adultos = models.PositiveIntegerField(default=1)
+    cant_ninos = models.PositiveIntegerField(default=0)
+    total_pagado = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
+    fecha_ingreso = models.DateTimeField(auto_now_add=True)
+    notas = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Cálculo automático del total antes de guardar
+        # 13 soles por adulto y 9 soles por niño
+        precio_adulto = Decimal('13.00')
+        precio_nino = Decimal('9.00')
+        self.total_pagado = (self.cant_adultos * precio_adulto) + (self.cant_ninos * precio_nino)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Sauna - {self.nombre_pagador} ({self.dni_pagador}) - S/{self.total_pagado}"

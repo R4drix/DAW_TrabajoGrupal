@@ -28,6 +28,11 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Reserva, Habitacion
+# views.py
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import RegistroSauna
 
 
 class PublicListMixin:
@@ -914,6 +919,78 @@ def api_crear_reserva(request):
                 'estado': estado_inicial
             }, status=201)
 
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+
+
+@csrf_exempt
+def api_admin_sauna(request, pk=None):
+    # 1. OBTENER LISTA DE REGISTROS DE SAUNA
+    if request.method == 'GET':
+        try:
+            registros = RegistroSauna.objects.all().order_by('-fecha_ingreso')
+            data = []
+            for r in registros:
+                data.append({
+                    'id': r.id,
+                    'nombre_pagador': r.nombre_pagador,
+                    'dni_pagador': r.dni_pagador,
+                    'cant_adultos': r.cant_adultos,
+                    'cant_ninos': r.cant_ninos,
+                    'total_personas': r.cant_adultos + r.cant_ninos,
+                    'total_pagado': str(r.total_pagado),
+                    'fecha_ingreso': r.fecha_ingreso.strftime('%Y-%m-%d %H:%M:%S'),
+                    'notas': r.notas or ''
+                })
+            return JsonResponse(data, safe=False, status=200)
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    # 2. REGISTRAR NUEVO INGRESO AL SAUNA
+    elif request.method == 'POST':
+        try:
+            body = json.loads(request.body or '{}')
+            nombre = body.get('nombre_pagador', '').strip()
+            dni = body.get('dni_pagador', '').strip()
+            cant_adultos = int(body.get('cant_adultos', 1))
+            cant_ninos = int(body.get('cant_ninos', 0))
+            notas = body.get('notas', '').strip()
+
+            if not nombre or not dni:
+                return JsonResponse({'ok': False, 'error': 'El nombre y DNI del pagador son obligatorios'}, status=400)
+
+            nuevo_registro = RegistroSauna.objects.create(
+                nombre_pagador=nombre,
+                dni_pagador=dni,
+                cant_adultos=cant_adultos,
+                cant_ninos=cant_ninos,
+                notas=notas
+            )
+
+            return JsonResponse({
+                'ok': True,
+                'mensaje': 'Registro de sauna creado con éxito',
+                'id': nuevo_registro.id,
+                'total_pagado': str(nuevo_registro.total_pagado)
+            }, status=201)
+
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+    # 3. ELIMINAR / CANCELAR UN REGISTRO
+    elif request.method == 'DELETE':
+        if not pk:
+            return JsonResponse({'ok': False, 'error': 'ID no proporcionado'}, status=400)
+        try:
+            reg = RegistroSauna.objects.get(pk=pk)
+            reg.delete()
+            return JsonResponse({'ok': True, 'mensaje': 'Registro eliminado exitosamente'}, status=200)
+        except RegistroSauna.DoesNotExist:
+            return JsonResponse({'ok': False, 'error': 'Registro no encontrado'}, status=404)
         except Exception as e:
             return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
