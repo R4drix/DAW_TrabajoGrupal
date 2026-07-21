@@ -7,12 +7,12 @@
   </a>
 
   <ul class="menu">
-    @if (login.isLogged() && login.user?.permisoAdmin) {
+    @if (login.isLogged() && login.user?.is_staff) {
       <li><a routerLink="/admin">Inicio</a></li>
+      <li><a routerLink="/admin/reservas">Reservas</a></li>
+      <li><a routerLink="/admin/rooms">Rooms</a></li>
       <li><a routerLink="/admin/sauna">Sauna</a></li>
-      <li><a routerLink="/admin/habitaciones">Habitaciones</a></li>
-      <li><a routerLink="/admin/restaurante">Restaurante</a></li>
-      <li><a routerLink="/admin/nosotros">Nosotros</a></li>
+      <li><a routerLink="/admin/comidas">Comidas</a></li>
     } @else {
       <li><a routerLink="/">Inicio</a></li>
       <li><a routerLink="/sauna">Sauna</a></li>
@@ -23,7 +23,7 @@
   </ul>
 
   <div class="nav-actions">
-    @if (!login.user?.permisoAdmin) {
+    @if (!login.isLogged() || !login.user?.is_staff) {
       <a routerLink="/reservar" class="btn-reserva">
         <span class="btn-reserva-text">Reserva Ahora</span>
         <i class="ti ti-arrow-right" aria-hidden="true"></i>
@@ -47,7 +47,7 @@
           <i class="ti ti-user-filled" aria-hidden="true"></i>
         </div>
         <div class="user-info">
-          <span class="user-name">{{ login.user?.nombre || 'Usuario' }}</span>
+          <span class="user-name">{{ login.user?.username || 'Usuario' }}</span>
           <span class="user-email">{{ login.user?.email }}</span>
         </div>
       </div>
@@ -55,13 +55,8 @@
       <hr>
 
       <div class="menu-item info-item">
-        <i class="ti ti-crown" aria-hidden="true"></i>
-        <span>Membresía: <strong>{{ login.user?.membresia || 'Estándar' }}</strong></span>
-      </div>
-
-      <div class="menu-item info-item">
-        <i class="ti ti-calendar-event" aria-hidden="true"></i>
-        <span>Reservas activas: <strong>{{ login.user?.reservasActivas ?? 0 }}</strong></span>
+        <i class="ti ti-shield" aria-hidden="true"></i>
+        <span>Rol: <strong>{{ login.user?.is_superuser ? 'Superusuario' : (login.user?.is_staff ? 'Administrador' : 'Estándar') }}</strong></span>
       </div>
 
       <hr>

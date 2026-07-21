@@ -2,7 +2,6 @@ import { NgClass } from '@angular/common';
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LoginService } from '../../services/login-service';
-import { User } from '../../services/models';
 
 @Component({
   selector: 'app-navbar',
@@ -25,8 +24,7 @@ export class Navbar {
 
   public logout() {
     this.login.logout();
-    this.login.user = null;
-    this.router.navigate([''])
+    this.router.navigate(['/home'])
   }
 
   @HostListener('document:click')

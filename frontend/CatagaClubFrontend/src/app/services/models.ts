@@ -5,6 +5,20 @@ export interface User {
   reservasActivas: string,
   permisoAdmin: boolean,
 }
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  is_staff: boolean;
+  is_superuser: boolean;
+}
+
+export interface LoginResponse {
+  ok: boolean;
+  user?: AuthUser;
+  error?: string;
+}
 export interface Habitacion {
   id: number;
   numero: number;

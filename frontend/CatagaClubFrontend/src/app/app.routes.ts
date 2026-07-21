@@ -4,23 +4,30 @@ import { Home } from './pages/home/home';
 import { Habitaciones } from './pages/habitaciones/habitaciones';
 import { Sauna } from './pages/sauna/sauna';
 import { Nosotros } from './pages/nosotros/nosotros';
-import { DashboardComponent } from './pages/dashboard/dashboard';
 import { Reservas } from './pages/reservas/reservas';
 import { Restaurante } from './pages/restaurante/restaurante';
 import { ReservarWizard } from './pages/reservar/reservar';
 import { Login } from './pages/login/login';
+
+import { AdminLayoutComponent } from './pages/admin/admin-layout/admin-layout';
 import { AdminHome } from './pages/admin/admin-home/admin-home';
-import { AdminHabitaciones } from './pages/admin/admin-habitaciones/admin-habitaciones';
+import { AdminReservas } from './pages/admin/admin-reservas/admin-reservas';
+import { AdminRooms } from './pages/admin/admin-rooms/admin-rooms';
+import { AdminSauna } from './pages/admin/admin-sauna/admin-sauna';
+import { AdminComidas } from './pages/admin/admin-comidas/admin-comidas';
+
+import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
     path: '',
     redirectTo: 'home',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'home',
-    component: Home
+    component: Home,
   },
   {
     path: 'reservar',
@@ -43,12 +50,9 @@ export const routes: Routes = [
     component: Nosotros,
   },
   {
-    path: 'dashboard',
-    component: DashboardComponent,
-  },
-  {
     path: 'reservas',
     component: Reservas,
+    canActivate: [authGuard],
   },
   {
     path: 'login',
@@ -56,9 +60,18 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [authGuard, adminGuard],
     children: [
-      {path: '', component: AdminHome},
-      {path: 'habitaciones', component: AdminHabitaciones}
-    ]
-  }
+      { path: '', component: AdminHome },
+      { path: 'reservas', component: AdminReservas },
+      { path: 'rooms', component: AdminRooms },
+      { path: 'sauna', component: AdminSauna },
+      { path: 'comidas', component: AdminComidas },
+    ],
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
+  },
 ];
