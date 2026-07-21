@@ -430,3 +430,142 @@ def habitaciones_disponibles_api(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
+
+
+
+
+@csrf_exempt
+def api_actualizar_habitacion(request, pk):
+    """
+    API JSON para actualizar una habitación existente desde el panel de administración.
+    Acepta métodos PUT o PATCH.
+    """
+    if request.method not in ['PUT', 'PATCH']:
+        return JsonResponse({'ok': False, 'error': 'Método no permitido.'}, status=405)
+
+    try:
+        habitacion = Habitacion.objects.get(pk=pk)
+    except Habitacion.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'La habitación no existe.'}, status=404)
+
+    try:
+        body = json.loads(request.body or '{}')
+        
+        # Actualizamos solo los campos presentados en la petición
+        if 'tipo' in body:
+            habitacion.tipo = body['tipo']
+        if 'precio_por_noche' in body:
+            habitacion.precio_por_noche = Decimal(str(body['precio_por_noche']))
+        if 'capacidad' in body:
+            habitacion.capacidad = int(body['capacidad'])
+        if 'esta_ocupada' in body:
+            habitacion.esta_ocupada = bool(body['esta_ocupada'])
+        if 'imagen_principal' in body:
+            habitacion.imagen_principal = body['imagen_principal']
+        if 'imagen_cama' in body:
+            habitacion.imagen_cama = body['imagen_cama']
+        if 'imagen_bano' in body:
+            habitacion.imagen_bano = body['imagen_bano']
+        if 'imagen_extra' in body:
+            habitacion.imagen_extra = body['imagen_extra']
+
+        # Ejecuta las validaciones clean() de tu modelo (precio > 0, etc.)
+        habitacion.full_clean()
+        habitacion.save()
+
+        # Retornamos el objeto con el mismo formato que usa 'estado_habitaciones_api'
+        return JsonResponse({
+            'ok': True,
+            'mensaje': 'Habitación actualizada correctamente.',
+            'habitacion': {
+                'id': habitacion.id,
+                'numero': habitacion.numero,
+                'tipo': habitacion.tipo,
+                'precio_por_noche': float(habitacion.precio_por_noche),
+                'esta_ocupada': habitacion.esta_ocupada,
+                'capacidad': habitacion.capacidad,
+                'imagen_principal': habitacion.imagen_principal,
+                'imagen_cama': habitacion.imagen_cama,
+                'imagen_bano': habitacion.imagen_bano,
+                'imagen_extra': habitacion.imagen_extra,
+            }
+        }, status=200)
+
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=400)
+    
+
+
+
+# En views.py
+
+@csrf_exempt
+def api_actualizar_plato(request, pk):
+    """API para actualizar platos del menú en Supabase desde Angular."""
+    if request.method not in ['PUT', 'PATCH']:
+        return JsonResponse({'ok': False, 'error': 'Método no permitido.'}, status=405)
+
+    try:
+        plato = Plato.objects.get(pk=pk)
+    except Plato.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'El plato no existe.'}, status=404)
+
+    try:
+        body = json.loads(request.body or '{}')
+
+        if 'nombre' in body:
+            plato.nombre = body['nombre']
+        if 'descripcion' in body:
+            plato.descripcion = body['descripcion']
+        if 'precio' in body:
+            plato.precio = Decimal(str(body['precio']))
+        if 'categoria' in body:
+            plato.categoria = body['categoria']
+        if 'disponible' in body:
+            plato.disponible = bool(body['disponible'])
+        if 'imagen_url' in body:
+            plato.imagen_url = body['imagen_url']
+
+        plato.full_clean() # Valida con las CATEGORIAS permitidas de tu modelo
+        plato.save()       # Impacta directamente en Supabase
+
+        return JsonResponse({
+            'ok': True,
+            'mensaje': 'Plato actualizado correctamente.',
+            'plato': {
+                'id': plato.id,
+                'nombre': plato.nombre,
+                'descripcion': plato.descripcion or '',
+                'precio': str(plato.precio),
+                'categoria': plato.categoria,
+                'disponible': plato.disponible,
+                'imagen_url': plato.imagen_url or '',
+            }
+        }, status=200)
+
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=400)
+    
+# views.py
+
+@csrf_exempt
+def api_obtener_platos(request):
+    """Devuelve la lista completa de platos para el admin y la carta."""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        
+    platos = Plato.objects.all()
+    data = [
+        {
+            'id': p.id,
+            'nombre': p.nombre,
+            'descripcion': p.descripcion or '',
+            'precio': str(p.precio),
+            'categoria': p.categoria,
+            'disponible': p.disponible,
+            'imagen_url': p.imagen_url or '',
+        }
+        for p in platos
+    ]
+    return JsonResponse(data, safe=False, status=200)

@@ -1,7 +1,150 @@
-<div class="placeholder">
-  <div class="placeholder-icon">
-    <i class="ti ti-door" aria-hidden="true"></i>
+<!-- ==========================
+     PAGE HEADER
+========================== -->
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Habitaciones</h1>
+    <p class="page-sub">Gestión y edición de habitaciones de Cátaga Club</p>
   </div>
-  <h1>Rooms</h1>
-  <p>Administración de habitaciones. Próximamente.</p>
+</div>
+
+<!-- STATE MESSAGES -->
+<div *ngIf="loading()" class="state-box">Cargando habitaciones...</div>
+<div *ngIf="errorMsg()" class="state-box error">{{ errorMsg() }}</div>
+
+<!-- MAIN PANEL -->
+<div class="panel room-panel" *ngIf="!loading()">
+  <div class="panel-head">
+    <h3>Lista de Habitaciones</h3>
+    <span class="panel-tag">{{ habitaciones().length }} registradas</span>
+  </div>
+
+  <div class="table-wrap">
+    <table class="rooms-table">
+      <thead>
+        <tr>
+          <th>Nº</th>
+          <th>Tipo</th>
+          <th>Precio / Noche</th>
+          <th>Capacidad</th>
+          <th>Estado</th>
+          <th>Vistas (Fotos)</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let room of habitaciones()">
+          <td><strong>#{{ room.numero }}</strong></td>
+          <td>{{ room.tipo }}</td>
+          <td class="price-cell">${{ room.precio_por_noche | number:'1.2-2' }}</td>
+          <td>{{ room.capacidad }} pers.</td>
+          <td>
+            <span class="status-pill" [ngClass]="room.esta_ocupada ? 'ocupada' : 'disponible'">
+              {{ room.esta_ocupada ? 'Ocupada' : 'Disponible' }}
+            </span>
+          </td>
+          <td>
+            <div class="thumb-list">
+              <img [src]="room.imagen_principal || placeholders.principal" (error)="onImgError($event, 'principal')" title="Vista Principal" alt="Principal">
+              <img [src]="room.imagen_cama || placeholders.cama" (error)="onImgError($event, 'cama')" title="Detalle Cama" alt="Cama">
+              <img [src]="room.imagen_bano || placeholders.bano" (error)="onImgError($event, 'bano')" title="Baño" alt="Baño">
+              <img [src]="room.imagen_extra || placeholders.extra" (error)="onImgError($event, 'extra')" title="Detalle Extra" alt="Extra">
+            </div>
+          </td>
+          <td class="text-right">
+            <button class="btn-action" (click)="abrirEditar(room)">
+              <i class="ti ti-pencil" aria-hidden="true"></i> Editar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="habitaciones().length === 0">
+          <td colspan="7" class="empty">No hay habitaciones disponibles.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==========================
+     MODAL DE EDICIÓN
+========================== -->
+<div class="modal-overlay" *ngIf="isModalOpen()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3 class="modal-title">Editar Habitación #{{ selectedRoom()?.numero }}</h3>
+        <p class="modal-sub">Actualiza la información y URLs de las fotos</p>
+      </div>
+      <button type="button" class="btn-close" (click)="cerrarModal()">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="roomForm" (ngSubmit)="guardarCambios()" class="modal-body">
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Número de Habitación</label>
+          <input type="number" formControlName="numero" readonly class="readonly-input">
+        </div>
+
+        <div class="form-group">
+          <label>Tipo de Habitación</label>
+          <select formControlName="tipo">
+            <option *ngFor="let tipo of tiposHabitacion" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Precio por Noche ($)</label>
+          <input type="number" step="0.01" formControlName="precio_por_noche" placeholder="0.00">
+        </div>
+
+        <div class="form-group">
+          <label>Capacidad (personas)</label>
+          <input type="number" formControlName="capacidad" placeholder="2">
+        </div>
+
+        <div class="form-group full-width">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="esta_ocupada">
+            <span>Marcar habitación como <strong>Ocupada</strong></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <h4 class="section-subtitle">Vistas de la Habitación (URLs)</h4>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Vista Principal</label>
+          <input type="text" formControlName="imagen_principal" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label>Foto Cama</label>
+          <input type="text" formControlName="imagen_cama" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label>Foto Cuarto de Baño</label>
+          <input type="text" formControlName="imagen_bano" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label>Foto Extra (Jacuzzi / Sauna)</label>
+          <input type="text" formControlName="imagen_extra" placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="roomForm.invalid || saving()">
+          {{ saving() ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>

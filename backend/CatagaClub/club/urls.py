@@ -42,4 +42,10 @@ urlpatterns = [
     path('api/dashboard/',                     views.api_dashboard,                  name='api_dashboard'),
 
     #reserva
-path('api/habitaciones/disponibles/', views.habitaciones_disponibles_api, name='habitaciones_disponibles_api'),]
+    path('api/habitaciones/disponibles/', views.habitaciones_disponibles_api, name='habitaciones_disponibles_api'),
+
+    # Actualizar habitación
+    path('api/habitaciones/<int:pk>/', views.api_actualizar_habitacion, name='api_actualizar_habitacion'),
+    path('api/platos/', views.lista_platos_api, name='lista_platos_api'),
+    path('api/platos/<int:pk>/', views.api_actualizar_plato, name='api_actualizar_plato'),
+]

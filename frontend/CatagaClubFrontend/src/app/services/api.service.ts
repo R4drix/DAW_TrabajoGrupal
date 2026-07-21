@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Consumo, Dashboard, Habitacion, Reserva, Camara } from './models';
+import { Plato } from '../pages/restaurante/restaurante';
 
 /**
  * Servicio único de acceso a la API del backend Django.
@@ -44,5 +45,23 @@ export class ApiService {
   crearReserva(reservaData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/reservas/`, reservaData);
   }
+  actualizarHabitacion(id: number, datos: Partial<Habitacion>): Observable<{ ok: boolean; habitacion: Habitacion }> {
+    return this.http.patch<{ ok: boolean; habitacion: Habitacion }>(
+      `${this.baseUrl}/habitaciones/${id}/`,
+      datos
+    );
+  }
 
+// En tu ApiService (api.service.ts)
+
+  getPlatos(): Observable<Plato[]> {
+    return this.http.get<Plato[]>(`${this.baseUrl}/platos/`);
+  }
+  
+  actualizarPlato(id: number, datos: Partial<Plato>): Observable<{ ok: boolean; plato: Plato }> {
+    return this.http.patch<{ ok: boolean; plato: Plato }>(
+      `${this.baseUrl}/platos/${id}/`,
+      datos
+    );
+  }
 }
