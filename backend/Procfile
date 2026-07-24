@@ -1,0 +1,1 @@
+web: cd CatagaClub && gunicorn CatagaClub.wsgi:application --bind 0.0.0.0:$PORT

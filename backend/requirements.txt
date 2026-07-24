@@ -12,3 +12,7 @@ whitenoise==6.8.2
 
 # CORS para Angular
 django-cors-headers==4.6.0
+
+# Deploy (Render): parsear DATABASE_URL y leer .env en local
+dj-database-url==2.2.0
+python-dotenv==1.0.1

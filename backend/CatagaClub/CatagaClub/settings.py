@@ -1,17 +1,37 @@
 """
 Django settings for CatagaClub project.
+Preparado para deploy en Render (Postgres + gunicorn + whitenoise).
+En desarrollo se puede usar SQLite seteando USE_SQLITE=1.
 """
-
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-b4s)6-0-#l@!kehpv^2k1pd!vzuuw5&f2_d!#hbv3z8=t*_tr%'
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR.parent / '.env')
+except ImportError:
+    pass
 
-DEBUG = True
+import dj_database_url
 
-ALLOWED_HOSTS = ['*']
+# ---------- Seguridad ----------
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-b4s)6-0-#l@!kehpv^2k1pd!vzuuw5&f2_d!#hbv3z8=t*_tr%'
+)
 
+DEBUG = os.environ.get('DJANGO_DEBUG', '0') == '1'
+
+ALLOWED_HOSTS = [
+    h.strip() for h in os.environ.get(
+        'DJANGO_ALLOWED_HOSTS',
+        'localhost,127.0.0.1,catagaclub-api.onrender.com'
+    ).split(',') if h.strip()
+]
+
+# ---------- Apps ----------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,17 +74,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CatagaClub.wsgi.application'
 
-# Base de datos SQLite — no requiere instalación de servidor
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'Cataga_Club_123',
-        'HOST': 'db.nfnpdxxsfsmhewyfeavu.supabase.co',
-        'PORT': '5432',
+# ---------- Base de datos ----------
+# Si USE_SQLITE=1, usa SQLite local. Si no, usa DATABASE_URL (Postgres en Render/Supabase).
+if os.environ.get('USE_SQLITE') == '1':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    database_url = os.environ.get('DATABASE_URL', '').strip()
+    if not database_url:
+        # Fallback seguro: SQLite si no hay DATABASE_URL seteada (útil para dev).
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+    else:
+        DATABASES = {
+            'default': dj_database_url.parse(database_url, conn_max_age=600)
+        }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -78,15 +111,24 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Auth
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/club/'
 LOGOUT_REDIRECT_URL = '/club/'
 
-# CORS — permite que Angular en :4200 consuma la API de Django en :8000
-CORS_ALLOWED_ORIGINS = [
+# ---------- CORS ----------
+# Lista base: localhost para dev.
+extra_origins = os.environ.get('CORS_ALLOWED_ORIGINS_EXTRA', '')
+origins = [
     'http://localhost:4200',
     'http://127.0.0.1:4200',
+    'https://cataga-club-frontend.vercel.app',
 ]
+if extra_origins:
+    origins += [o.strip() for o in extra_origins.split(',') if o.strip()]
+
+CORS_ALLOWED_ORIGINS = origins
 CORS_ALLOW_CREDENTIALS = True

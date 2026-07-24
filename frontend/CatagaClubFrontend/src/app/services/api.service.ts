@@ -4,19 +4,22 @@ import { Observable } from 'rxjs';
 
 import { Consumo, Dashboard, Habitacion, Reserva, Camara } from './models';
 import { Plato } from '../pages/restaurante/restaurante';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio único de acceso a la API del backend Django.
  * Centraliza la URL base y los endpoints para que cualquier componente
  * pueda consumirlos sin repetir configuración.
+ *
+ * La URL base viene de `environment.apiBaseUrl`:
+ *  - dev:  http://localhost:8000/club/api
+ *  - prod: https://<tu-backend>.onrender.com/club/api
  */
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-
-  // En desarrollo: Django corre en :8000 y Angular en :4200
-  private readonly baseUrl = 'http://localhost:8000/club/api';
-  private apiUrl = 'http://localhost:8000/club/api';
+  private readonly baseUrl = environment.apiBaseUrl;
+  private readonly apiUrl = environment.apiBaseUrl;
 
   getEstadoHabitaciones(): Observable<{ ok: boolean; count: number; habitaciones: Habitacion[] }> {
     return this.http.get<{ ok: boolean; count: number; habitaciones: Habitacion[] }>(`${this.baseUrl}/estado/`);
@@ -52,12 +55,10 @@ export class ApiService {
     );
   }
 
-// En tu ApiService (api.service.ts)
-
   getPlatos(): Observable<Plato[]> {
     return this.http.get<Plato[]>(`${this.baseUrl}/platos/`);
   }
-  
+
   actualizarPlato(id: number, datos: Partial<Plato>): Observable<{ ok: boolean; plato: Plato }> {
     return this.http.patch<{ ok: boolean; plato: Plato }>(
       `${this.baseUrl}/platos/${id}/`,
@@ -65,14 +66,10 @@ export class ApiService {
     );
   }
 
-
-
-  // Cancelar o actualizar estado
   actualizarReserva(id: number, datos: { estado?: string; total?: number; notas?: string }): Observable<any> {
     return this.http.patch<any>(`${this.baseUrl}/reservas/${id}/`, datos);
   }
 
-  // Eliminar definitivamente
   eliminarReserva(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/reservas/${id}/`);
   }
