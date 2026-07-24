@@ -133,3 +133,34 @@ if extra_origins:
 
 CORS_ALLOWED_ORIGINS = origins
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# ---------- CSRF ----------
+CSRF_TRUSTED_ORIGINS = [
+    'https://daw-trabajo-grupal-jenkdk50b-iker281521.vercel.app',
+    'https://cataga-club-frontend.vercel.app',
+]
+
+# ---------- Cookies cross-site (para que login funcione desde Vercel) ----------
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
