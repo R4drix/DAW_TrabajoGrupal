@@ -51,4 +51,7 @@ urlpatterns = [
     # API Sauna
     path('api/sauna/', views.api_admin_sauna, name='api_admin_sauna'),
     path('api/sauna/<int:pk>/', views.api_admin_sauna, name='api_admin_sauna_detail'),
+
+    # API Cámaras
+    path('api/camaras/', views.api_camaras, name='api_camaras'),
     ]

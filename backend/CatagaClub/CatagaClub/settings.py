@@ -126,6 +126,7 @@ origins = [
     'http://localhost:4200',
     'http://127.0.0.1:4200',
     'https://cataga-club-frontend.vercel.app',
+    'https://daw-trabajo-grupal-jenkdk50b-iker281521.vercel.app',
 ]
 if extra_origins:
     origins += [o.strip() for o in extra_origins.split(',') if o.strip()]
