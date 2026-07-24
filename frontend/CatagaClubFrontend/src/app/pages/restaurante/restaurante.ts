@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 export interface Plato {
   id: number;
@@ -40,9 +41,7 @@ export class Restaurante implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    // 🔴 ANTES: 'http://localhost:8000/club/api/club/platos/'
-    // 🟢 AHORA (URL corregida):
-    this.http.get<Plato[]>('http://localhost:8000/club/api/platos/').subscribe({
+    this.http.get<Plato[]>(`${environment.apiBaseUrl}/platos/`).subscribe({
       next: (data) => {
         // Filtrar únicamente los platos marcados como disponibles
         const platosDisponibles = data.filter(plato => plato.disponible);

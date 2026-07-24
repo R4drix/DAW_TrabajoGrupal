@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { environment } from '../../../../environments/environment';
 
 export interface ReservaAdmin {
   id: number;
@@ -141,7 +142,8 @@ export class AdminReservas implements OnInit {
   }
 
   imprimirComprobante(id: number): void {
-    window.open(`http://localhost:8000/club/reservas/${id}/cuenta/`, '_blank');
+    const apiBase = environment.apiBaseUrl.replace('/club/api', '');
+    window.open(`${apiBase}/club/reservas/${id}/cuenta/`, '_blank');
   }
 
   getEstadoBadgeClass(estado: string): string {

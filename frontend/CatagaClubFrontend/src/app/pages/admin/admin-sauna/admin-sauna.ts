@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 export interface RegistroSauna {
   id?: number;
@@ -22,7 +23,7 @@ export interface RegistroSauna {
   styleUrls: ['./admin-sauna.css']
 })
 export class AdminSauna implements OnInit {
-  private apiUrl = 'http://localhost:8000/club/api/sauna/';
+  private apiUrl = `${environment.apiBaseUrl}/sauna/`;
 
   registros: RegistroSauna[] = [];
   cargando: boolean = false;

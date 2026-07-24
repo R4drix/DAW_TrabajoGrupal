@@ -1,16 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Service()
 export class AdminService {
-    private readonly url = '';
+    private readonly url = `${environment.apiBaseUrl}/estado-habitaciones/`;
     private http = inject(HttpClient);
 
     public actualizarHabitacion(id: number, data: any) {
-    //No se que se manda con put :v
-        return this.http.put(this.url, id /* ??? */)
+        return this.http.put(this.url, id);
     }
     getHabitaciones() {
-        return this.http.get('http://localhost:8000/club/api/estado-habitaciones/');
+        return this.http.get(this.url);
     }
 }

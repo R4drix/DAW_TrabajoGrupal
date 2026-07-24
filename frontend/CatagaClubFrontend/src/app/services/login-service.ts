@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 import { AuthUser, LoginResponse } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
-  private readonly apiUrl = 'http://localhost:8000/club/api';
+  private readonly apiUrl = environment.apiBaseUrl;
   private http = inject(HttpClient);
 
   public user: AuthUser | null = null;

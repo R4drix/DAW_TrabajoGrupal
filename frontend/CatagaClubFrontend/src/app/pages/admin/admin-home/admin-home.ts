@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { AdminService } from '../../../services/admin-service';
 import { ApiService } from '../../../services/api.service';
+import { environment } from '../../../../environments/environment';
 
 // --- INTERFACES LOCALES ---
 export interface ReservaAdmin {
@@ -54,7 +55,7 @@ export class AdminHome implements OnInit {
   private apiReservas = inject(ApiService);
   private http = inject(HttpClient);
 
-  private saunaUrl = 'http://localhost:8000/club/api/sauna/';
+  private saunaUrl = `${environment.apiBaseUrl}/sauna/`;
 
   // Estados reactivos
   public habitaciones = signal<any[]>([]);
